@@ -3,7 +3,7 @@ import axios from "axios";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../../firebase";
 
-const API_BASE = import.meta.env?.VITE_API_BASE_URL || "";
+const API_BASE = import.meta.env?.VITE_API_URL || "";
 
 function AdminDashboard() {
     const [stats, setStats] = useState({ totalUsers: 0, totalPrograms: 0, totalAdmins: 0 });

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 
-const API_BASE = import.meta.env?.VITE_API_BASE_URL || "";
+const API_BASE = import.meta.env?.VITE_API_URL || "";
 
 function UserManagement() {
     const [users, setUsers] = useState([]);
