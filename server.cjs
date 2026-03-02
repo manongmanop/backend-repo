@@ -400,8 +400,9 @@ const upload = multer({
 });
 
 // เชื่อมต่อกับ MongoDB
-mongoose.connect('mongodb://127.0.0.1:27017/fitness_app')
-  .then(() => console.log('MongoDB Connected'))
+const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/fitness_app';
+mongoose.connect(mongoURI)
+  .then(() => console.log('MongoDB Connected to:', process.env.MONGODB_URI ? 'Atlas/Cloud' : 'Local'))
   .catch(err => console.log('MongoDB Connection Error:', err));
 
 // --- เพิ่มส่วน User Schema และ Routes ---
@@ -1857,5 +1858,9 @@ app.get("/api/__summary_internal/program/:uid", async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+if (require.main === module) {
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
+
+module.exports = app;
 
