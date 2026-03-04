@@ -4,7 +4,7 @@ import {
     signInWithEmailAndPassword,
     onAuthStateChanged,
     signOut,
-    GoogleAuthProvider, 
+    GoogleAuthProvider,
     signInWithPopup,
     sendPasswordResetEmail,
     // sendEmailVerification
@@ -17,7 +17,8 @@ const googleProvider = new GoogleAuthProvider();
 
 export function UserAuthContextProvider({ children }) {
 
-    const [user, setUser] = useState({});
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     function logIn(email, password) {
         return signInWithEmailAndPassword(auth, email, password);
@@ -47,17 +48,18 @@ export function UserAuthContextProvider({ children }) {
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentuser) => {
-            console.log("Auth", currentuser); // ตรวจดูว่า email อยู่ใน currentuser ไหม
+            console.log("Auth", currentuser);
             setUser(currentuser);
+            setLoading(false);
         });
         return () => unsubscribe();
-    }, []);    
+    }, []);
 
-  return (
-    <userAuthContext.Provider value={{ user, logIn, signUp, logOut, googleSignIn , resetPassword  }}>
-        {children}
-    </userAuthContext.Provider>
-  )
+    return (
+        <userAuthContext.Provider value={{ user, logIn, signUp, logOut, googleSignIn, resetPassword, loading }}>
+            {!loading && children}
+        </userAuthContext.Provider>
+    )
 }
 
 export function useUserAuth() {

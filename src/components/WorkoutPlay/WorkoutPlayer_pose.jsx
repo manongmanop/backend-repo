@@ -5,7 +5,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import "./WorkoutPlayer.css";
 // Removed asset imports, relying on public folder
 import { useUserAuth } from "../../context/UserAuthContext.jsx";
-const API_BASE = import.meta.env?.VITE_API_BASE_URL || "";
+const API_BASE = import.meta.env?.VITE_API_URL || "";
 import { ExerciseCameraManager } from '../../ExerciseCameraManager.jsx';
 /* =========================================
    SECTION 1: Helpers & Utilities

@@ -9,8 +9,19 @@ const app = express();
 console.log("🚀 SERVER STARTING - VERSION: WITH_SESSION_ID_AND_FEEDBACK_FIXED"); // Unique Log
 const PORT = process.env.PORT || 5000;
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://detectexerciseuser.vercel.app"
+  ],
+  credentials: true
+}));
 app.use(express.json());
+
+// Base Route
+app.get("/", (req, res) => {
+  res.send("Exercise API is running 🚀");
+});
 
 const bodyMetricSchema = new Schema({
   // ID ของผู้ใช้ที่เป็นเจ้าของข้อมูลนี้ (เชื่อมกับ Collection 'users')
@@ -389,8 +400,9 @@ const upload = multer({
 });
 
 // เชื่อมต่อกับ MongoDB
-mongoose.connect('mongodb://127.0.0.1:27017/fitness_app')
-  .then(() => console.log('MongoDB Connected'))
+const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/fitness_app';
+mongoose.connect(mongoURI)
+  .then(() => console.log('MongoDB Connected to:', process.env.MONGODB_URI ? 'Atlas/Cloud' : 'Local'))
   .catch(err => console.log('MongoDB Connection Error:', err));
 
 // --- เพิ่มส่วน User Schema และ Routes ---
@@ -1846,5 +1858,9 @@ app.get("/api/__summary_internal/program/:uid", async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+if (require.main === module) {
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
+
+module.exports = app;
 

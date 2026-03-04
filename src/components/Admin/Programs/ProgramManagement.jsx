@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 
-const API_BASE = import.meta.env?.VITE_API_BASE_URL || "";
+
 
 function ProgramManagement() {
+    const navigate = useNavigate();
     const [programs, setPrograms] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const fetchPrograms = async () => {
         try {
-            const res = await axios.get(`${API_BASE}/api/programs`);
+            const res = await axios.get(`/api/programs`);
             setPrograms(res.data);
         } catch (err) {
             console.error("Error fetching programs:", err);
@@ -38,7 +40,7 @@ function ProgramManagement() {
 
         if (result.isConfirmed) {
             try {
-                await axios.delete(`${API_BASE}/api/programs/${id}`);
+                await axios.delete(`/api/programs/${id}`);
                 Swal.fire("สำเร็จ", "ลบโปรแกรมเรียบร้อยแล้ว", "success");
                 fetchPrograms();
             } catch (err) {
@@ -64,7 +66,7 @@ function ProgramManagement() {
                         cursor: "pointer",
                         fontWeight: "bold"
                     }}
-                    onClick={() => Swal.fire('Info', 'ระบบเพิ่มโปรแกรมสามารถเชื่อมกับหน้าเพิ่มที่ทำไว้แล้วทีหลัง', 'info')}
+                    onClick={() => navigate('/admin/programs/add')}
                 >
                     + เพิ่มโปรแกรมใหม่
                 </button>
@@ -99,7 +101,20 @@ function ProgramManagement() {
                                     </td>
                                     <td style={{ padding: "12px 15px", fontWeight: "bold" }}>{program.name || "ไม่มีชื่อ"}</td>
                                     <td style={{ padding: "12px 15px" }}>{program.exercises ? program.exercises.length : "0"} ท่า</td>
-                                    <td style={{ padding: "12px 15px" }}>
+                                    <td style={{ padding: "12px 15px", display: "flex", gap: "10px" }}>
+                                        <button
+                                            onClick={() => navigate(`/admin/programs/edit/${program._id}`)}
+                                            style={{
+                                                padding: "6px 12px",
+                                                backgroundColor: "#f59e0b",
+                                                color: "white",
+                                                border: "none",
+                                                borderRadius: "4px",
+                                                cursor: "pointer"
+                                            }}
+                                        >
+                                            แก้ไข
+                                        </button>
                                         <button
                                             onClick={() => handleDelete(program._id, program.name)}
                                             style={{
