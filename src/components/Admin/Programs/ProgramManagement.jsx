@@ -10,6 +10,11 @@ function ProgramManagement() {
     const [programs, setPrograms] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    const [searchTerm, setSearchTerm] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState("ทั้งหมด");
+
+    const categories = ["ทั้งหมด", "โปรแกรมช่วงบน", "โปรแกรมช่วงล่าง", "โปรแกรมหน้าท้อง", "ลดไขมัน", "เพิ่มกล้าม", "กระชับก้น & ขา"];
+
     const fetchPrograms = async () => {
         try {
             const res = await axios.get(`/api/workout_programs`);
@@ -50,6 +55,12 @@ function ProgramManagement() {
         }
     };
 
+    const filteredPrograms = programs.filter(program => {
+        const matchesSearch = (program.name || "").toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesCategory = selectedCategory === "ทั้งหมด" || program.category === selectedCategory;
+        return matchesSearch && matchesCategory;
+    });
+
     if (loading) return <div>กำลังโหลดรายชื่อโปรแกรม...</div>;
 
     return (
@@ -72,6 +83,41 @@ function ProgramManagement() {
                 </button>
             </div>
 
+            {/* แถบค้นหา และ ตัวกรอง Tag */}
+            <div style={{ display: "flex", gap: "15px", marginBottom: "20px", flexWrap: "wrap" }}>
+                <input
+                    type="text"
+                    placeholder="🔍 ค้นหาชื่อโปรแกรม..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    style={{
+                        padding: "10px 15px",
+                        border: "1px solid #d1d5db",
+                        borderRadius: "6px",
+                        flex: "1",
+                        minWidth: "250px",
+                        outline: "none"
+                    }}
+                />
+                <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    style={{
+                        padding: "10px 15px",
+                        border: "1px solid #d1d5db",
+                        borderRadius: "6px",
+                        outline: "none",
+                        backgroundColor: "white",
+                        cursor: "pointer",
+                        minWidth: "200px"
+                    }}
+                >
+                    {categories.map((cat, idx) => (
+                        <option key={idx} value={cat}>{cat}</option>
+                    ))}
+                </select>
+            </div>
+
             <div style={{ overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
                     <thead>
@@ -79,17 +125,18 @@ function ProgramManagement() {
                             <th style={{ padding: "12px 15px", color: "#4b5563" }}>ลำดับ</th>
                             <th style={{ padding: "12px 15px", color: "#4b5563" }}>รูปโปรแกรม</th>
                             <th style={{ padding: "12px 15px", color: "#4b5563" }}>ชื่อโปรแกรม</th>
+                            <th style={{ padding: "12px 15px", color: "#4b5563" }}>หมวดหมู่ (Tag)</th>
                             <th style={{ padding: "12px 15px", color: "#4b5563" }}>จำนวนท่า</th>
                             <th style={{ padding: "12px 15px", color: "#4b5563" }}>จัดการ</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {programs.length === 0 ? (
+                        {filteredPrograms.length === 0 ? (
                             <tr>
-                                <td colSpan="5" style={{ textAlign: "center", padding: "20px" }}>ไม่มีข้อมูลโปรแกรม</td>
+                                <td colSpan="6" style={{ textAlign: "center", padding: "20px" }}>ไม่พบข้อมูลโปรแกรมที่ค้นหา</td>
                             </tr>
                         ) : (
-                            programs.map((program, index) => (
+                            filteredPrograms.map((program, index) => (
                                 <tr key={program._id} style={{ borderBottom: "1px solid #f3f4f6" }}>
                                     <td style={{ padding: "12px 15px" }}>{index + 1}</td>
                                     <td style={{ padding: "12px 15px" }}>
@@ -100,7 +147,24 @@ function ProgramManagement() {
                                         )}
                                     </td>
                                     <td style={{ padding: "12px 15px", fontWeight: "bold" }}>{program.name || "ไม่มีชื่อ"}</td>
-                                    <td style={{ padding: "12px 15px" }}>{program.exercises ? program.exercises.length : "0"} ท่า</td>
+                                    <td style={{ padding: "12px 15px" }}>
+                                        {program.category ? (
+                                            <span style={{
+                                                backgroundColor: "#e0e7ff",
+                                                color: "#4f46e5",
+                                                padding: "4px 10px",
+                                                borderRadius: "12px",
+                                                fontSize: "0.85em",
+                                                fontWeight: "bold",
+                                                display: "inline-block"
+                                            }}>
+                                                {program.category}
+                                            </span>
+                                        ) : (
+                                            <span style={{ color: "#9ca3af", fontStyle: "italic" }}>-</span>
+                                        )}
+                                    </td>
+                                    <td style={{ padding: "12px 15px" }}>{program.exercises ? program.exercises.length : (program.workoutList ? program.workoutList.length : "0")} ท่า</td>
                                     <td style={{ padding: "12px 15px", display: "flex", gap: "10px" }}>
                                         <button
                                             onClick={() => navigate(`/admin/programs/edit/${program._id}`)}

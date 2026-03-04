@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { collection, query, where, getDocs, doc, getDoc, orderBy } from "firebase/firestore";
+import axios from "axios";
+import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../../firebase";
 import { MdArrowBack, MdAccessTime, MdLocalFireDepartment, MdFitnessCenter } from "react-icons/md";
 
@@ -30,32 +31,48 @@ function UserProgress() {
     useEffect(() => {
         const fetchUserProgress = async () => {
             try {
-                // 1. Fetch User Info
-                const userDoc = await getDoc(doc(db, "users", uid));
-                if (userDoc.exists()) {
-                    setUserData(userDoc.data());
-                } else {
-                    setUserData({ name: "ไม่พบข้อมูลผู้ใช้" });
+                // 1. Fetch User Info (Still from Firebase since identity is there)
+                let tempName = "ไม่ระบุ";
+                let tempEmail = "ไม่ระบุ";
+                try {
+                    const userDoc = await getDoc(doc(db, "users", uid));
+                    if (userDoc.exists()) {
+                        const d = userDoc.data();
+                        tempName = d.name || tempName;
+                        tempEmail = d.email || tempEmail;
+                        setUserData(d);
+                    } else {
+                        setUserData({ name: "ไม่พบข้อมูลผู้ใช้" });
+                    }
+                } catch (e) {
+                    console.error("Firebase fetch error:", e);
                 }
 
-                // 2. Fetch Summary
-                const summaryQuery = query(collection(db, "user_summary"), where("userId", "==", uid));
-                const summarySnapshot = await getDocs(summaryQuery);
-                if (!summarySnapshot.empty) {
-                    setSummary(summarySnapshot.docs[0].data());
-                }
+                // 2. Fetch Summary & History from MongoDB Backend (server.cjs)
+                const [statsRes, historyRes] = await Promise.all([
+                    axios.get(`/api/stats/dashboard/${uid}`),
+                    axios.get(`/api/histories/user/${uid}`)
+                ]);
 
-                // 3. Fetch History
-                const historyQuery = query(collection(db, "user_history"), where("userId", "==", uid), orderBy("date", "desc"));
-                const historySnapshot = await getDocs(historyQuery);
-                const historyList = [];
-                historySnapshot.forEach((doc) => {
-                    historyList.push({ id: doc.id, ...doc.data() });
+                // Destructure stats logic (totalWorkouts, totalCalories)
+                const dashboardSummary = statsRes.data.summary || { totalWorkouts: 0, totalCalories: 0 };
+                const userHistory = historyRes.data || [];
+
+                // 3. Aggregate Total Time
+                // Because /api/stats/dashboard doesn't return totalTime inherently, 
+                // we'll calculate it from the histories list.
+                const computedTotalTime = userHistory.reduce((acc, h) => acc + (h.totalSeconds || 0), 0);
+
+                setSummary({
+                    totalWorkouts: dashboardSummary.totalWorkouts || 0,
+                    totalCalories: dashboardSummary.totalCalories || 0,
+                    totalTime: computedTotalTime
                 });
-                setHistory(historyList);
+
+                setHistory(userHistory);
 
             } catch (error) {
-                console.error("Error fetching user progress:", error);
+                console.error("Error fetching user progress from API:", error);
             } finally {
                 setLoading(false);
             }
@@ -132,11 +149,11 @@ function UserProgress() {
                             </thead>
                             <tbody>
                                 {history.map((record) => (
-                                    <tr key={record.id} style={{ borderBottom: "1px solid #f3f4f6" }}>
-                                        <td style={{ padding: "12px", color: "#4b5563" }}>{formatDate(record.date)}</td>
-                                        <td style={{ padding: "12px", fontWeight: "bold", color: "#1f2937" }}>{record.programName || "Unknown"}</td>
-                                        <td style={{ padding: "12px", color: "#4b5563" }}>{formatTime(record.duration)}</td>
-                                        <td style={{ padding: "12px", color: "#ef4444", fontWeight: "500" }}>{record.calories ? record.calories.toFixed(0) : 0} kcal</td>
+                                    <tr key={record._id} style={{ borderBottom: "1px solid #f3f4f6" }}>
+                                        <td style={{ padding: "12px", color: "#4b5563" }}>{formatDate(record.finishedAt || record.createdAt)}</td>
+                                        <td style={{ padding: "12px", fontWeight: "bold", color: "#1f2937" }}>{record.programName || "โปรแกรมออกกำลังกาย"}</td>
+                                        <td style={{ padding: "12px", color: "#4b5563" }}>{formatTime(record.totalSeconds)}</td>
+                                        <td style={{ padding: "12px", color: "#ef4444", fontWeight: "500" }}>{record.caloriesBurned ? record.caloriesBurned.toFixed(0) : 0} kcal</td>
                                     </tr>
                                 ))}
                             </tbody>

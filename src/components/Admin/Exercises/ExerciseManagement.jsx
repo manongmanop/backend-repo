@@ -9,6 +9,7 @@ function ExerciseManagement() {
     const navigate = useNavigate();
     const [exercises, setExercises] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
 
     const fetchExercises = async () => {
         try {
@@ -50,6 +51,10 @@ function ExerciseManagement() {
         }
     };
 
+    const filteredExercises = exercises.filter(ex => {
+        return (ex.name || "").toLowerCase().includes(searchTerm.toLowerCase());
+    });
+
     if (loading) return <div>กำลังโหลดรายชื่อท่าออกกำลังกาย...</div>;
 
     return (
@@ -72,6 +77,24 @@ function ExerciseManagement() {
                 </button>
             </div>
 
+            {/* แถบค้นหา */}
+            <div style={{ marginBottom: "20px" }}>
+                <input
+                    type="text"
+                    placeholder="🔍 ค้นหาชื่อท่าออกกำลังกาย..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    style={{
+                        padding: "10px 15px",
+                        border: "1px solid #d1d5db",
+                        borderRadius: "6px",
+                        width: "100%",
+                        maxWidth: "400px",
+                        outline: "none"
+                    }}
+                />
+            </div>
+
             <div style={{ overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
                     <thead>
@@ -80,16 +103,17 @@ function ExerciseManagement() {
                             <th style={{ padding: "12px 15px", color: "#4b5563" }}>รูป/วิดีโอ</th>
                             <th style={{ padding: "12px 15px", color: "#4b5563" }}>ชื่อท่า</th>
                             <th style={{ padding: "12px 15px", color: "#4b5563" }}>ประเภท</th>
+                            <th style={{ padding: "12px 15px", color: "#4b5563" }}>แท็ก (Tags)</th>
                             <th style={{ padding: "12px 15px", color: "#4b5563" }}>จัดการ</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {exercises.length === 0 ? (
+                        {filteredExercises.length === 0 ? (
                             <tr>
-                                <td colSpan="5" style={{ textAlign: "center", padding: "20px" }}>ไม่มีข้อมูลท่าออกกำลังกาย</td>
+                                <td colSpan="6" style={{ textAlign: "center", padding: "20px" }}>ไม่พบข้อมูลท่าออกกำลังกายที่ค้นหา</td>
                             </tr>
                         ) : (
-                            exercises.map((exercise, index) => (
+                            filteredExercises.map((exercise, index) => (
                                 <tr key={exercise._id} style={{ borderBottom: "1px solid #f3f4f6" }}>
                                     <td style={{ padding: "12px 15px" }}>{index + 1}</td>
                                     <td style={{ padding: "12px 15px" }}>
@@ -101,33 +125,53 @@ function ExerciseManagement() {
                                     </td>
                                     <td style={{ padding: "12px 15px", fontWeight: "bold" }}>{exercise.name || "ไม่มีชื่อ"}</td>
                                     <td style={{ padding: "12px 15px" }}>{exercise.type === "reps" ? "จำนวนครั้ง (Reps)" : "จับเวลา (Time)"}</td>
-                                    <td style={{ padding: "12px 15px", display: "flex", gap: "10px" }}>
-                                        <button
-                                            onClick={() => navigate(`/admin/exercises/edit/${exercise._id}`)}
-                                            style={{
-                                                padding: "6px 12px",
-                                                backgroundColor: "#f59e0b",
-                                                color: "white",
-                                                border: "none",
-                                                borderRadius: "4px",
-                                                cursor: "pointer"
-                                            }}
-                                        >
-                                            แก้ไข
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(exercise._id, exercise.name)}
-                                            style={{
-                                                padding: "6px 12px",
-                                                backgroundColor: "#ef4444",
-                                                color: "white",
-                                                border: "none",
-                                                borderRadius: "4px",
-                                                cursor: "pointer"
-                                            }}
-                                        >
-                                            ลบ
-                                        </button>
+                                    <td style={{ padding: "12px 15px" }}>
+                                        <div style={{ display: "flex", gap: "5px", flexWrap: "wrap", maxWidth: "250px" }}>
+                                            {exercise.difficulty && (
+                                                <span style={{ backgroundColor: "#fef3c7", color: "#d97706", padding: "4px 8px", borderRadius: "12px", fontSize: "0.8em", fontWeight: "bold", textTransform: "capitalize" }}>
+                                                    {exercise.difficulty}
+                                                </span>
+                                            )}
+                                            {exercise.muscles && exercise.muscles.length > 0 ? (
+                                                exercise.muscles.map((m, idx) => (
+                                                    <span key={idx} style={{ backgroundColor: "#e0f2fe", color: "#0284c7", padding: "4px 8px", borderRadius: "12px", fontSize: "0.8em", fontWeight: "bold", textTransform: "capitalize" }}>
+                                                        {m}
+                                                    </span>
+                                                ))
+                                            ) : (
+                                                !exercise.difficulty && <span style={{ color: "#9ca3af", fontStyle: "italic" }}>-</span>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td style={{ padding: "12px 15px" }}>
+                                        <div style={{ display: "flex", gap: "10px" }}>
+                                            <button
+                                                onClick={() => navigate(`/admin/exercises/edit/${exercise._id}`)}
+                                                style={{
+                                                    padding: "6px 12px",
+                                                    backgroundColor: "#f59e0b",
+                                                    color: "white",
+                                                    border: "none",
+                                                    borderRadius: "4px",
+                                                    cursor: "pointer"
+                                                }}
+                                            >
+                                                แก้ไข
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(exercise._id, exercise.name)}
+                                                style={{
+                                                    padding: "6px 12px",
+                                                    backgroundColor: "#ef4444",
+                                                    color: "white",
+                                                    border: "none",
+                                                    borderRadius: "4px",
+                                                    cursor: "pointer"
+                                                }}
+                                            >
+                                                ลบ
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))
