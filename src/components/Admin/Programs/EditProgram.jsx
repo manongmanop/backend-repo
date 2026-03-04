@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 
-const API_BASE = import.meta.env?.VITE_API_URL || "";
+
 
 function EditProgram() {
     const { id } = useParams();
@@ -24,7 +24,7 @@ function EditProgram() {
     useEffect(() => {
         const fetchProgram = async () => {
             try {
-                const res = await axios.get(`${API_BASE}/api/programs/${id}`);
+                const res = await axios.get(`/api/programs/${id}`);
                 const data = res.data;
                 setName(data.name || "");
                 setDescription(data.description || "");
@@ -71,7 +71,7 @@ function EditProgram() {
                 formData.append("image", imageFile);
             }
 
-            const res = await axios.put(`${API_BASE}/api/programs/${id}`, formData, {
+            const res = await axios.put(`/api/programs/${id}`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data"
                 }
@@ -92,7 +92,7 @@ function EditProgram() {
     const getMediaDisplayUrl = (url) => {
         if (!url) return "";
         if (url.startsWith("http")) return url;
-        return `${API_BASE}${url.startsWith("/") ? url : "/" + url}`;
+        return url;
     };
 
     if (fetching) return <div style={{ padding: "20px" }}>กำลังโหลดข้อมูล...</div>;

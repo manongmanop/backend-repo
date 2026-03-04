@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 
-const API_BASE = import.meta.env?.VITE_API_URL || "";
+
 
 function AddProgram() {
     const navigate = useNavigate();

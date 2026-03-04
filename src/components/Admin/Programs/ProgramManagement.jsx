@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 
-const API_BASE = (import.meta.env?.VITE_API_URL || "").replace(/\/$/, "");
+
 
 function ProgramManagement() {
     const navigate = useNavigate();
@@ -12,7 +12,7 @@ function ProgramManagement() {
 
     const fetchPrograms = async () => {
         try {
-            const res = await axios.get(`${API_BASE}/api/programs`);
+            const res = await axios.get(`/api/programs`);
             setPrograms(res.data);
         } catch (err) {
             console.error("Error fetching programs:", err);
@@ -40,7 +40,7 @@ function ProgramManagement() {
 
         if (result.isConfirmed) {
             try {
-                await axios.delete(`${API_BASE}/api/programs/${id}`);
+                await axios.delete(`/api/programs/${id}`);
                 Swal.fire("สำเร็จ", "ลบโปรแกรมเรียบร้อยแล้ว", "success");
                 fetchPrograms();
             } catch (err) {

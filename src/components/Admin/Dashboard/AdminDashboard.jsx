@@ -4,7 +4,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../../firebase";
 import { MdPeople, MdFitnessCenter, MdOutlineAdminPanelSettings, MdFormatListBulleted } from "react-icons/md";
 
-const API_BASE = (import.meta.env?.VITE_API_URL || "").replace(/\/$/, "");
+
 
 function AdminDashboard() {
     const [stats, setStats] = useState({ totalUsers: 0, totalPrograms: 0, totalAdmins: 0, totalExercises: 0 });
@@ -14,8 +14,8 @@ function AdminDashboard() {
         const fetchStats = async () => {
             try {
                 // Fetch users from MongoDB (or Firebase depending on your structure)
-                const usersRes = await axios.get(`${API_BASE}/api/users`);
-                const programsRes = await axios.get(`${API_BASE}/api/programs`);
+                const usersRes = await axios.get(`/api/users`);
+                const programsRes = await axios.get(`/api/programs`);
 
                 // Fetch admins from Firestore
                 const adminSnapshot = await getDocs(collection(db, "admin"));

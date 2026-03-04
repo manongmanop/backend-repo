@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import { doc, setDoc, deleteDoc, collection, getDocs } from "firebase/firestore";
 import { db } from "../../../../firebase";
 
-const API_BASE = (import.meta.env?.VITE_API_URL || "").replace(/\/$/, "");
+
 
 function UserManagement() {
     const [users, setUsers] = useState([]);
@@ -14,7 +14,7 @@ function UserManagement() {
     const fetchData = async () => {
         try {
             const [usersRes, adminsSnapshot] = await Promise.all([
-                axios.get(`${API_BASE}/api/users`),
+                axios.get(`/api/users`),
                 getDocs(collection(db, "admin"))
             ]);
 
@@ -98,7 +98,7 @@ function UserManagement() {
         if (result.isConfirmed) {
             try {
                 // NOTE: In a full production app, you might also need an admin endpoint to delete the user from Firebase Auth
-                await axios.delete(`${API_BASE}/api/users/${id}`);
+                await axios.delete(`/api/users/${id}`);
                 Swal.fire("ลบสำเร็จ", "ผู้ใช้ถูกลบออกจากระบบฐานข้อมูลแล้ว", "success");
                 fetchData(); // Refresh list
             } catch (err) {
