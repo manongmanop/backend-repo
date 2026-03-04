@@ -1,0 +1,100 @@
+.add-exercise {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  max-width: 800px;
+  margin: 0 auto;
+}
+.add-exercise .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.add-exercise .header h2 {
+  color: #333;
+  margin: 0;
+}
+.add-exercise .header .btn-back {
+  padding: 8px 16px;
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.add-exercise .header .btn-back:hover {
+  background-color: #4b5563;
+}
+.add-exercise .exercise-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.add-exercise .exercise-form .form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #4b5563;
+}
+.add-exercise .exercise-form .form-group .form-input, .add-exercise .exercise-form .form-group .form-select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #d1d5db;
+  outline: none;
+  box-sizing: border-box;
+}
+.add-exercise .exercise-form .form-group .form-input:focus, .add-exercise .exercise-form .form-group .form-select:focus {
+  border-color: #8b5cf6;
+}
+.add-exercise .exercise-form .form-group .form-textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #d1d5db;
+  min-height: 100px;
+  outline: none;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+.add-exercise .exercise-form .form-group .form-textarea:focus {
+  border-color: #8b5cf6;
+}
+.add-exercise .exercise-form .form-row {
+  display: flex;
+  gap: 15px;
+}
+.add-exercise .exercise-form .form-row .col {
+  flex: 1;
+}
+.add-exercise .exercise-form .image-preview {
+  margin-top: 10px;
+}
+.add-exercise .exercise-form .image-preview img {
+  max-width: 200px;
+  border-radius: 8px;
+}
+.add-exercise .exercise-form .submit-section {
+  margin-top: 20px;
+}
+.add-exercise .exercise-form .submit-section .btn-submit {
+  padding: 10px 20px;
+  background-color: #8b5cf6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  width: 100%;
+  transition: background-color 0.2s;
+}
+.add-exercise .exercise-form .submit-section .btn-submit:hover {
+  background-color: #7c3aed;
+}
+.add-exercise .exercise-form .submit-section .btn-submit:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}/*# sourceMappingURL=AddExercise.css.map */

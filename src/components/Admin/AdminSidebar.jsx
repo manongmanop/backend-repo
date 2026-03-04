@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { MdDashboard, MdPeople, MdFitnessCenter, MdLogout, MdOutlineSportsGymnastics } from "react-icons/md";
 import { useUserAuth } from "../../context/UserAuthContext";
+import "./AdminSidebar.scss";
 
 function AdminSidebar() {
     const location = useLocation();
@@ -23,59 +24,30 @@ function AdminSidebar() {
     ];
 
     return (
-        <div style={{
-            width: "350px",
-            backgroundColor: "#1f2937",
-            color: "white",
-            display: "flex",
-            flexDirection: "column",
-            boxShadow: "2px 0 5px rgba(0,0,0,0.1)"
-        }}>
-            <div style={{ padding: "20px", fontSize: "1.5rem", fontWeight: "bold", borderBottom: "1px solid #374151" }}>
+        <div className="admin-sidebar">
+            <div className="sidebar-header">
                 ระบบจัดการสำหรับผู้ดูแลระบบ
             </div>
 
-            <div style={{ flex: 1, padding: "20px 0" }}>
+            <div className="sidebar-menu">
                 {menuItems.map((item) => {
                     const isActive = location.pathname.includes(item.path);
                     return (
                         <Link
                             key={item.name}
                             to={item.path}
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                padding: "15px 20px",
-                                color: isActive ? "#3b82f6" : "#d1d5db",
-                                textDecoration: "none",
-                                backgroundColor: isActive ? "#111827" : "transparent",
-                                borderLeft: isActive ? "4px solid #3b82f6" : "4px solid transparent",
-                                transition: "all 0.2s"
-                            }}
+                            className={`menu-item ${isActive ? "active" : ""}`}
                         >
-                            <span style={{ marginRight: "10px", fontSize: "1.2rem" }}>{item.icon}</span>
+                            <span className="menu-icon">{item.icon}</span>
                             {item.name}
                         </Link>
                     );
                 })}
             </div>
 
-            <div style={{ padding: "20px", borderTop: "1px solid #374151" }}>
-                <button
-                    onClick={handleLogout}
-                    style={{
-                        display: "flex",
-                        alignItems: "center",
-                        width: "100%",
-                        padding: "10px",
-                        background: "transparent",
-                        border: "none",
-                        color: "#ef4444",
-                        cursor: "pointer",
-                        fontSize: "1rem"
-                    }}
-                >
-                    <MdLogout style={{ marginRight: "10px" }} /> ออกจากระบบ
+            <div className="sidebar-footer">
+                <button className="logout-btn" onClick={handleLogout}>
+                    <MdLogout className="logout-icon" /> ออกจากระบบ
                 </button>
             </div>
         </div>

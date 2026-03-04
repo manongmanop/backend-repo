@@ -784,8 +784,12 @@ const workoutProgramSchema = new Schema({
   image: String,
   category: {
     type: String,
-    enum: ['โปรแกรมช่วงบน', 'โปรแกรมช่วงล่าง', 'โปรแกรมหน้าท้อง', 'ลดไขมัน', 'เพิ่มกล้าม', 'กระชับก้น & ขา'],
-    default: 'โปรแกรมช่วงบน'
+    enum: [
+      'ความแข็งแรง', 'คาร์ดิโอ', 'ความยืดหยุ่น', 'HIIT',
+      'โปรแกรมช่วงบน', 'โปรแกรมช่วงล่าง', 'โปรแกรมหน้าท้อง',
+      'ลดไขมัน', 'เพิ่มกล้าม', 'กระชับก้น & ขา'
+    ],
+    default: 'ความแข็งแรง'
   },
   DataFeedback: {
     easy: { type: Number, default: 0 },
@@ -943,40 +947,47 @@ app.put('/api/workout_programs/:id', upload.single('image'), async (req, res) =>
       'booty-legs': 'กระชับก้น & ขา'
     };
 
-    let reqCategory = req.body.category || 'โปรแกรมช่วงบน';
+    // Fetch existing program first so we can preserve fields not sent in this request
+    const existing = await WorkoutProgram.findById(req.params.id);
+    if (!existing) return res.status(404).json({ error: 'Workout program not found' });
+
+    let reqCategory = req.body.category || existing.category || 'โปรแกรมช่วงบน';
     if (categoryMap[reqCategory.toLowerCase()]) {
       reqCategory = categoryMap[reqCategory.toLowerCase()];
     }
 
-    const updatedData = {
-      name: req.body.name,
-      description: req.body.description,
-      duration: req.body.duration,
-      caloriesBurned: req.body.caloriesBurned,
-      category: reqCategory, // เพิ่ม category field
-      image: req.file ? `/uploads/${req.file.filename}` : '', // แก้ไขให้ใช้ URL
-      workoutList: (() => {
-        if (!req.body.workoutList) return [];
-        let dataStr = typeof req.body.workoutList === 'string' ? req.body.workoutList.trim() : JSON.stringify(req.body.workoutList);
-        if (dataStr.startsWith('exercises:')) {
-          dataStr = dataStr.replace(/^exercises:\s*/, '').trim();
+    // Parse workoutList if sent, otherwise keep existing
+    let parsedWorkoutList = existing.workoutList;
+    if (req.body.workoutList !== undefined) {
+      let dataStr = typeof req.body.workoutList === 'string'
+        ? req.body.workoutList.trim()
+        : JSON.stringify(req.body.workoutList);
+      if (dataStr.startsWith('exercises:')) {
+        dataStr = dataStr.replace(/^exercises:\s*/, '').trim();
+      }
+      try {
+        const parsed = JSON.parse(dataStr);
+        if (parsed && Array.isArray(parsed.exercises)) {
+          parsedWorkoutList = parsed.exercises;
+        } else {
+          parsedWorkoutList = Array.isArray(parsed) ? parsed : existing.workoutList;
         }
-        try {
-          const parsed = JSON.parse(dataStr);
-          if (parsed && Array.isArray(parsed.exercises)) {
-            return parsed.exercises;
-          }
-          return Array.isArray(parsed) ? parsed : [];
-        } catch (e) {
-          console.error("Error parsing workoutList in PUT:", e);
-          return [];
-        }
-      })(),
-    };
-
-    if (req.file) {
-      updatedData.image = `/uploads/${req.file.filename}`; // แก้ไขให้ใช้ URL
+      } catch (e) {
+        console.error("Error parsing workoutList in PUT:", e);
+        parsedWorkoutList = existing.workoutList; // preserve on parse error
+      }
     }
+
+    const updatedData = {
+      name: req.body.name || existing.name,
+      description: req.body.description !== undefined ? req.body.description : existing.description,
+      duration: req.body.duration || existing.duration,
+      caloriesBurned: req.body.caloriesBurned !== undefined ? req.body.caloriesBurned : existing.caloriesBurned,
+      category: reqCategory,
+      // Only update image if a new file was uploaded; otherwise preserve existing
+      image: req.file ? `/uploads/${req.file.filename}` : existing.image,
+      workoutList: parsedWorkoutList,
+    };
 
     const updatedProgram = await WorkoutProgram.findByIdAndUpdate(
       req.params.id,

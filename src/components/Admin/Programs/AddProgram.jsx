@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
-
-
+import "./AddProgram.scss";
 
 function AddProgram() {
     const navigate = useNavigate();
@@ -14,8 +13,15 @@ function AddProgram() {
     const [description, setDescription] = useState("");
     const [duration, setDuration] = useState("");
     const [caloriesBurned, setCaloriesBurned] = useState("");
+    const [category, setCategory] = useState("ความแข็งแรง");
     const [imageFile, setImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState("");
+
+    const CATEGORIES = [
+        "ความแข็งแรง", "คาร์ดิโอ", "ความยืดหยุ่น", "HIIT",
+        "โปรแกรมช่วงบน", "โปรแกรมช่วงล่าง", "โปรแกรมหน้าท้อง",
+        "ลดไขมัน", "เพิ่มกล้าม", "กระชับก้น & ขา"
+    ];
 
     // Minimal form structure without complex workoutList for MVP, can add workoutList if needed later
 
@@ -43,9 +49,7 @@ function AddProgram() {
             formData.append("description", description);
             formData.append("duration", duration);
             formData.append("caloriesBurned", caloriesBurned || 0);
-
-            // Just sending an empty array as a JSON string if the backend expects it, or ignore for now.
-            // formData.append("workoutList", JSON.stringify([])); 
+            formData.append("category", category);
 
             if (imageFile) {
                 formData.append("image", imageFile); // 'image' is commonly used by multer
@@ -71,94 +75,98 @@ function AddProgram() {
     };
 
     return (
-        <div style={{ background: "white", padding: "20px", borderRadius: "8px", boxShadow: "0 2px 10px rgba(0,0,0,0.05)", maxWidth: "800px", margin: "0 auto" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-                <h2 style={{ color: "#333", margin: 0 }}>เพิ่มโปรแกรมใหม่</h2>
+        <div className="add-program">
+            <div className="header">
+                <h2>เพิ่มโปรแกรมใหม่</h2>
                 <button
                     onClick={() => navigate(-1)}
-                    style={{ padding: "8px 16px", backgroundColor: "#6b7280", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}
+                    className="btn-back"
                 >
                     กลับ
                 </button>
             </div>
 
-            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-                <div>
-                    <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold", color: "#4b5563" }}>ชื่อโปรแกรม *</label>
+            <form onSubmit={handleSubmit} className="program-form">
+                <div className="form-group">
+                    <label>ชื่อโปรแกรม *</label>
                     <input
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        style={{ width: "100%", padding: "10px", borderRadius: "4px", border: "1px solid #d1d5db" }}
+                        className="form-input"
                         placeholder="เช่น สร้างกล้ามเนื้อหน้าอกเบื้องต้น"
                         required
                     />
                 </div>
 
-                <div>
-                    <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold", color: "#4b5563" }}>รายละเอียด</label>
+                <div className="form-group">
+                    <label>รายละเอียด</label>
                     <textarea
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
-                        style={{ width: "100%", padding: "10px", borderRadius: "4px", border: "1px solid #d1d5db", minHeight: "100px" }}
+                        className="form-textarea"
                         placeholder="คำอธิบายโปรแกรม..."
                         required
                     />
                 </div>
 
-                <div style={{ display: "flex", gap: "15px" }}>
-                    <div style={{ flex: 1 }}>
-                        <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold", color: "#4b5563" }}>ระยะเวลา (นาที) *</label>
+                <div className="form-row">
+                    <div className="col form-group">
+                        <label>ระยะเวลา (นาที) *</label>
                         <input
                             type="number"
                             value={duration}
                             onChange={(e) => setDuration(e.target.value)}
-                            style={{ width: "100%", padding: "10px", borderRadius: "4px", border: "1px solid #d1d5db" }}
+                            className="form-input"
                             placeholder="เช่น 30"
                             required
                         />
                     </div>
-                    <div style={{ flex: 1 }}>
-                        <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold", color: "#4b5563" }}>แคลอรี่ที่เผาผลาญ (kcal)</label>
+                    <div className="col form-group">
+                        <label>แคลอรี่ที่เผาผลาญ (kcal)</label>
                         <input
                             type="number"
                             value={caloriesBurned}
                             onChange={(e) => setCaloriesBurned(e.target.value)}
-                            style={{ width: "100%", padding: "10px", borderRadius: "4px", border: "1px solid #d1d5db" }}
+                            className="form-input"
                             placeholder="เช่น 250"
                         />
                     </div>
                 </div>
 
-                <div>
-                    <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold", color: "#4b5563" }}>รูปภาพปกโปรแกรม</label>
+                <div className="form-group">
+                    <label>หมวดหมู่โปรแกรม</label>
+                    <select
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                        className="form-input"
+                    >
+                        {CATEGORIES.map((cat) => (
+                            <option key={cat} value={cat}>{cat}</option>
+                        ))}
+                    </select>
+                </div>
+
+                <div className="form-group">
+                    <label>รูปภาพปกโปรแกรม</label>
                     <input
                         type="file"
                         accept="image/*"
                         onChange={handleImageChange}
-                        style={{ width: "100%", padding: "10px", borderRadius: "4px", border: "1px solid #d1d5db" }}
+                        className="form-input"
                     />
                     {imagePreview && (
-                        <div style={{ marginTop: "10px" }}>
-                            <img src={imagePreview} alt="Preview" style={{ maxWidth: "200px", borderRadius: "8px" }} />
+                        <div className="image-preview">
+                            <img src={imagePreview} alt="Preview" />
                         </div>
                     )}
                 </div>
 
-                <div style={{ marginTop: "20px" }}>
+                <div className="submit-section">
                     <button
                         type="submit"
                         disabled={loading}
-                        style={{
-                            padding: "10px 20px",
-                            backgroundColor: "#3b82f6",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "4px",
-                            cursor: loading ? "not-allowed" : "pointer",
-                            fontWeight: "bold",
-                            width: "100%"
-                        }}
+                        className="btn-submit"
                     >
                         {loading ? "กำลังบันทึก..." : "บันทึกโปรแกรม"}
                     </button>

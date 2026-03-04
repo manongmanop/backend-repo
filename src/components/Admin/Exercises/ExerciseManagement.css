@@ -1,0 +1,127 @@
+.exercise-management {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+.exercise-management .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.exercise-management .header h2 {
+  color: #333;
+  margin: 0;
+}
+.exercise-management .header .btn-add {
+  padding: 8px 16px;
+  background-color: #8b5cf6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+.exercise-management .header .btn-add:hover {
+  background-color: #7c3aed;
+}
+.exercise-management .filter-bar {
+  margin-bottom: 20px;
+}
+.exercise-management .filter-bar .search-input {
+  padding: 10px 15px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  width: 100%;
+  max-width: 400px;
+  outline: none;
+  box-sizing: border-box;
+}
+.exercise-management .filter-bar .search-input:focus {
+  border-color: #8b5cf6;
+}
+.exercise-management .table-container {
+  overflow-x: auto;
+}
+.exercise-management .table-container .data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+.exercise-management .table-container .data-table th {
+  padding: 12px 15px;
+  color: #4b5563;
+  background-color: #f3f4f6;
+  border-bottom: 2px solid #e5e7eb;
+}
+.exercise-management .table-container .data-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #f3f4f6;
+}
+.exercise-management .table-container .data-table td.font-bold {
+  font-weight: bold;
+}
+.exercise-management .table-container .data-table td .thumbnail {
+  width: 50px;
+  height: 50px;
+  -o-object-fit: cover;
+     object-fit: cover;
+  border-radius: 5px;
+}
+.exercise-management .table-container .data-table td .placeholder-img {
+  width: 50px;
+  height: 50px;
+  background-color: #e5e7eb;
+  border-radius: 5px;
+}
+.exercise-management .table-container .data-table td .tags-container {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  max-width: 250px;
+}
+.exercise-management .table-container .data-table td .tags-container .tag-difficulty {
+  background-color: #fef3c7;
+  color: #d97706;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+.exercise-management .table-container .data-table td .tags-container .tag-muscle {
+  background-color: #e0f2fe;
+  color: #0284c7;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+.exercise-management .table-container .data-table td .tags-container .no-tag {
+  color: #9ca3af;
+  font-style: italic;
+}
+.exercise-management .table-container .data-table .empty-row {
+  text-align: center;
+  padding: 20px;
+}
+.exercise-management .action-buttons {
+  display: flex;
+  gap: 10px;
+}
+.exercise-management .action-buttons .btn {
+  padding: 6px 12px;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.exercise-management .action-buttons .btn.btn-edit {
+  background-color: #f59e0b;
+}
+.exercise-management .action-buttons .btn.btn-delete {
+  background-color: #ef4444;
+}/*# sourceMappingURL=ExerciseManagement.css.map */

@@ -4,8 +4,7 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { doc, setDoc, deleteDoc, updateDoc, collection, getDocs } from "firebase/firestore";
 import { db } from "../../../../firebase";
-
-
+import "./UserManagement.scss";
 
 function UserManagement() {
     const navigate = useNavigate();
@@ -125,37 +124,22 @@ function UserManagement() {
     if (loading) return <div>กำลังโหลดรายชื่อ...</div>;
 
     return (
-        <div style={{ background: "white", padding: "20px", borderRadius: "8px", boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}>
-            <h2 style={{ color: "#333", marginBottom: "20px" }}>จัดการผู้ใช้งาน</h2>
+        <div className="user-management">
+            <h2>จัดการผู้ใช้งาน</h2>
 
             {/* แถบค้นหา และ ตัวกรอง สถานะ */}
-            <div style={{ display: "flex", gap: "15px", marginBottom: "20px", flexWrap: "wrap" }}>
+            <div className="filter-bar">
                 <input
                     type="text"
                     placeholder="🔍 ค้นหาชื่อ หรือ อีเมล..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    style={{
-                        padding: "10px 15px",
-                        border: "1px solid #d1d5db",
-                        borderRadius: "6px",
-                        flex: "1",
-                        minWidth: "250px",
-                        outline: "none"
-                    }}
+                    className="search-input"
                 />
                 <select
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value)}
-                    style={{
-                        padding: "10px 15px",
-                        border: "1px solid #d1d5db",
-                        borderRadius: "6px",
-                        outline: "none",
-                        backgroundColor: "white",
-                        cursor: "pointer",
-                        minWidth: "200px"
-                    }}
+                    className="status-select"
                 >
                     <option value="ทั้งหมด">ผู้ใช้ทั้งหมด</option>
                     <option value="แอดมิน (Admin)">แอดมิน (Admin)</option>
@@ -163,62 +147,47 @@ function UserManagement() {
                 </select>
             </div>
 
-            <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+            <div className="table-container">
+                <table className="data-table">
                     <thead>
-                        <tr style={{ backgroundColor: "#f3f4f6", borderBottom: "2px solid #e5e7eb" }}>
-                            <th style={{ padding: "12px 15px", color: "#4b5563" }}>ลำดับ</th>
-                            <th style={{ padding: "12px 15px", color: "#4b5563" }}>ชื่อ</th>
-                            <th style={{ padding: "12px 15px", color: "#4b5563" }}>อีเมล</th>
-                            <th style={{ padding: "12px 15px", color: "#4b5563" }}>สถานะ</th>
-                            <th style={{ padding: "12px 15px", color: "#4b5563" }}>วันที่สมัคร</th>
-                            <th style={{ padding: "12px 15px", color: "#4b5563" }}>จัดการ</th>
+                        <tr>
+                            <th>ลำดับ</th>
+                            <th>ชื่อ</th>
+                            <th>อีเมล</th>
+                            <th>สถานะ</th>
+                            <th>วันที่สมัคร</th>
+                            <th>จัดการ</th>
                         </tr>
                     </thead>
                     <tbody>
                         {filteredUsers.length === 0 ? (
                             <tr>
-                                <td colSpan="6" style={{ textAlign: "center", padding: "20px" }}>ไม่พบข้อมูลผู้ใช้ที่ค้นหา</td>
+                                <td colSpan="6" className="empty-row">ไม่พบข้อมูลผู้ใช้ที่ค้นหา</td>
                             </tr>
                         ) : (
                             filteredUsers.map((user, index) => (
-                                <tr key={user._id} style={{ borderBottom: "1px solid #f3f4f6" }}>
-                                    <td style={{ padding: "12px 15px" }}>{index + 1}</td>
-                                    <td style={{ padding: "12px 15px", fontWeight: "bold" }}>{user.name || "ไม่มีชื่อ"}</td>
-                                    <td style={{ padding: "12px 15px" }}>{user.email || "-"}</td>
-                                    <td style={{ padding: "12px 15px" }}>
+                                <tr key={user._id}>
+                                    <td>{index + 1}</td>
+                                    <td className="font-bold">{user.name || "ไม่มีชื่อ"}</td>
+                                    <td>{user.email || "-"}</td>
+                                    <td>
                                         {adminUids.has(user.firebaseUid) ? (
-                                            <span style={{ padding: "4px 8px", backgroundColor: "#fef3c7", color: "#d97706", borderRadius: "12px", fontSize: "0.85rem", fontWeight: "bold" }}>Admin</span>
+                                            <span className="status-badge badge-admin">Admin</span>
                                         ) : (
-                                            <span style={{ padding: "4px 8px", backgroundColor: "#e0e7ff", color: "#4338ca", borderRadius: "12px", fontSize: "0.85rem", fontWeight: "bold" }}>User</span>
+                                            <span className="status-badge badge-user">User</span>
                                         )}
                                     </td>
-                                    <td style={{ padding: "12px 15px" }}>{formatDate(user.createdAt)}</td>
-                                    <td style={{ padding: "12px 15px", display: "flex", gap: "10px" }}>
+                                    <td>{formatDate(user.createdAt || user["createdAt "])}</td>
+                                    <td className="action-buttons">
                                         <button
                                             onClick={() => navigate(`/admin/users/progress/${user.firebaseUid}`)}
-                                            style={{
-                                                padding: "6px 12px",
-                                                backgroundColor: "#3b82f6",
-                                                color: "white",
-                                                border: "none",
-                                                borderRadius: "4px",
-                                                cursor: "pointer",
-                                                minWidth: "100px"
-                                            }}
+                                            className="btn btn-primary"
                                         >
                                             ดู Progress
                                         </button>
                                         <button
                                             onClick={() => handleDelete(user._id, user.firebaseUid)}
-                                            style={{
-                                                padding: "6px 12px",
-                                                backgroundColor: "#ef4444",
-                                                color: "white",
-                                                border: "none",
-                                                borderRadius: "4px",
-                                                cursor: "pointer"
-                                            }}
+                                            className="btn btn-danger"
                                         >
                                             ลบ
                                         </button>

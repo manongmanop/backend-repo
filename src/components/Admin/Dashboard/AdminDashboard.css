@@ -1,0 +1,210 @@
+.admin-dashboard .dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+.admin-dashboard .admin-card {
+  cursor: pointer;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: transform 0.2s;
+}
+.admin-dashboard .admin-card:hover {
+  transform: translateY(-5px);
+}
+.admin-dashboard .admin-card.card-users {
+  border-left: 5px solid #3b82f6;
+}
+.admin-dashboard .admin-card.card-programs {
+  border-left: 5px solid #10b981;
+}
+.admin-dashboard .admin-card.card-exercises {
+  border-left: 5px solid #8b5cf6;
+}
+.admin-dashboard .admin-card.card-admins {
+  border-left: 5px solid #f59e0b;
+}
+.admin-dashboard .admin-card .card-content h4 {
+  margin: 0 0 10px 0;
+  color: #6b7280;
+  font-size: 1rem;
+}
+.admin-dashboard .admin-card .card-content p {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1f2937;
+}
+.admin-dashboard .admin-card .icon-users {
+  font-size: 3rem;
+  color: #bfdbfe;
+}
+.admin-dashboard .admin-card .icon-programs {
+  font-size: 3rem;
+  color: #a7f3d0;
+}
+.admin-dashboard .admin-card .icon-exercises {
+  font-size: 3rem;
+  color: #ddd6fe;
+}
+.admin-dashboard .admin-card .icon-admins {
+  font-size: 3rem;
+  color: #fde68a;
+}
+.admin-dashboard .bottom-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 30px;
+}
+.admin-dashboard .bottom-grid .chart-panel {
+  grid-column: 1/-1;
+}
+.admin-dashboard .dashboard-panel {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+.admin-dashboard .dashboard-panel .panel-title {
+  color: #333;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-bottom: 2px solid #f3f4f6;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+.admin-dashboard .dashboard-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.admin-dashboard .dashboard-list .list-item {
+  padding: 12px 0;
+  border-bottom: 1px solid #f3f4f6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  overflow: hidden;
+}
+.admin-dashboard .dashboard-list .list-item.program-item {
+  justify-content: flex-start;
+  align-items: center;
+  gap: 12px;
+}
+.admin-dashboard .dashboard-list .list-item .item-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+.admin-dashboard .dashboard-list .list-item .item-info .avatar {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #bfdbfe;
+  color: #1e3a8a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+}
+.admin-dashboard .dashboard-list .list-item .item-info .item-name {
+  margin: 0;
+  font-weight: bold;
+  color: #374151;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.admin-dashboard .dashboard-list .list-item .item-info .item-sub {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+.admin-dashboard .dashboard-list .list-item .thumbnail {
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  -o-object-fit: cover;
+     object-fit: cover;
+  border-radius: 8px;
+}
+.admin-dashboard .dashboard-list .list-item .placeholder-thumbnail {
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  background-color: #e5e7eb;
+  border-radius: 8px;
+}
+.admin-dashboard .dashboard-list .list-item .item-info-text {
+  flex: 1;
+  min-width: 0;
+}
+.admin-dashboard .dashboard-list .list-item .item-info-text .item-name {
+  margin: 0;
+  font-weight: bold;
+  color: #374151;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.admin-dashboard .dashboard-list .list-item .item-info-text .item-sub {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+.admin-dashboard .dashboard-list .list-item .item-meta {
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+.admin-dashboard .dashboard-list .empty-message {
+  color: #6b7280;
+}
+.admin-dashboard .activity-timeline {
+  position: relative;
+  padding-left: 20px;
+  border-left: 2px solid #e5e7eb;
+}
+.admin-dashboard .activity-timeline .timeline-item {
+  position: relative;
+  margin-bottom: 20px;
+  padding-left: 15px;
+}
+.admin-dashboard .activity-timeline .timeline-item .timeline-dot {
+  position: absolute;
+  left: -27px;
+  top: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+.admin-dashboard .activity-timeline .timeline-item .timeline-dot.dot-user {
+  background: #3b82f6;
+}
+.admin-dashboard .activity-timeline .timeline-item .timeline-dot.dot-program {
+  background: #10b981;
+}
+.admin-dashboard .activity-timeline .timeline-item .timeline-title {
+  margin: 0;
+  color: #374151;
+  font-weight: 500;
+}
+.admin-dashboard .activity-timeline .timeline-item .timeline-time {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+.admin-dashboard .activity-timeline .empty-timeline {
+  color: #6b7280;
+}/*# sourceMappingURL=AdminDashboard.css.map */

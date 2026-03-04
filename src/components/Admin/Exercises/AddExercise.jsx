@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
-
-
+import "./AddExercise.scss";
 
 function AddExercise() {
     const navigate = useNavigate();
@@ -82,137 +81,128 @@ function AddExercise() {
     };
 
     return (
-        <div style={{ background: "white", padding: "20px", borderRadius: "8px", boxShadow: "0 2px 10px rgba(0,0,0,0.05)", maxWidth: "800px", margin: "0 auto" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-                <h2 style={{ color: "#333", margin: 0 }}>เพิ่มท่าออกกำลังกายใหม่</h2>
+        <div className="add-exercise">
+            <div className="header">
+                <h2>เพิ่มท่าออกกำลังกายใหม่</h2>
                 <button
                     onClick={() => navigate(-1)}
-                    style={{ padding: "8px 16px", backgroundColor: "#6b7280", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}
+                    className="btn-back"
                 >
                     กลับ
                 </button>
             </div>
 
-            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-                <div>
-                    <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold", color: "#4b5563" }}>ชื่อท่า *</label>
+            <form onSubmit={handleSubmit} className="exercise-form">
+                <div className="form-group">
+                    <label>ชื่อท่า *</label>
                     <input
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        style={{ width: "100%", padding: "10px", borderRadius: "4px", border: "1px solid #d1d5db" }}
+                        className="form-input"
                         required
                     />
                 </div>
 
-                <div>
-                    <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold", color: "#4b5563" }}>ประเภท *</label>
+                <div className="form-group">
+                    <label>ประเภท *</label>
                     <select
                         value={type}
                         onChange={(e) => setType(e.target.value)}
-                        style={{ width: "100%", padding: "10px", borderRadius: "4px", border: "1px solid #d1d5db" }}
+                        className="form-select"
                     >
                         <option value="reps">จำนวนครั้ง (Reps)</option>
                         <option value="time">จับเวลา (Time)</option>
                     </select>
                 </div>
 
-                <div>
-                    <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold", color: "#4b5563" }}>รายละเอียด (วิธีเล่น)</label>
+                <div className="form-group">
+                    <label>รายละเอียด (วิธีเล่น)</label>
                     <textarea
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
-                        style={{ width: "100%", padding: "10px", borderRadius: "4px", border: "1px solid #d1d5db", minHeight: "100px" }}
+                        className="form-textarea"
                         required
                     />
                 </div>
 
-                <div style={{ display: "flex", gap: "15px" }}>
-                    <div style={{ flex: 1 }}>
-                        <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold", color: "#4b5563" }}>
+                <div className="form-row">
+                    <div className="col form-group">
+                        <label>
                             {type === "reps" ? "จำนวนครั้งเป้าหมาย *" : "ระยะเวลาที่ใช้ต่อเซ็ต (วินาที) *"}
                         </label>
                         <input
                             type="number"
                             value={value}
                             onChange={(e) => setValue(e.target.value)}
-                            style={{ width: "100%", padding: "10px", borderRadius: "4px", border: "1px solid #d1d5db" }}
+                            className="form-input"
                             required
                         />
                     </div>
-                    <div style={{ flex: 1 }}>
-                        <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold", color: "#4b5563" }}>ระยะเวลาเล่นรวม (duration: วินาที)</label>
+                    <div className="col form-group">
+                        <label>ระยะเวลาเล่นรวม (duration: วินาที)</label>
                         <input
                             type="number"
                             value={duration}
                             onChange={(e) => setDuration(e.target.value)}
-                            style={{ width: "100%", padding: "10px", borderRadius: "4px", border: "1px solid #d1d5db" }}
+                            className="form-input"
                         />
                     </div>
                 </div>
 
-                <div style={{ display: "flex", gap: "15px" }}>
-                    <div style={{ flex: 1 }}>
-                        <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold", color: "#4b5563" }}>แคลอรี่ที่เผาผลาญ (kcal)</label>
+                <div className="form-row">
+                    <div className="col form-group">
+                        <label>แคลอรี่ที่เผาผลาญ (kcal)</label>
                         <input
                             type="number"
                             value={caloriesBurned}
                             onChange={(e) => setCaloriesBurned(e.target.value)}
-                            style={{ width: "100%", padding: "10px", borderRadius: "4px", border: "1px solid #d1d5db" }}
+                            className="form-input"
                         />
                     </div>
-                    <div style={{ flex: 1 }}>
-                        <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold", color: "#4b5563" }}>กล้ามเนื้อเป้าหมาย (คั่นด้วยลูกน้ำ)</label>
+                    <div className="col form-group">
+                        <label>กล้ามเนื้อเป้าหมาย (คั่นด้วยลูกน้ำ)</label>
                         <input
                             type="text"
                             value={muscles}
                             onChange={(e) => setMuscles(e.target.value)}
-                            style={{ width: "100%", padding: "10px", borderRadius: "4px", border: "1px solid #d1d5db" }}
+                            className="form-input"
                             placeholder="อก, ไหล่, หลังแขน"
                         />
                     </div>
                 </div>
 
-                <div>
-                    <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold", color: "#4b5563" }}>รูปภาพสาธิตท่า *</label>
+                <div className="form-group">
+                    <label>รูปภาพสาธิตท่า *</label>
                     <input
                         type="file"
                         accept="image/*"
                         onChange={handleImageChange}
-                        style={{ width: "100%", padding: "10px", borderRadius: "4px", border: "1px solid #d1d5db" }}
+                        className="form-input"
                         required
                     />
                     {imagePreview && (
-                        <div style={{ marginTop: "10px" }}>
-                            <img src={imagePreview} alt="Preview" style={{ maxWidth: "200px", borderRadius: "8px" }} />
+                        <div className="image-preview">
+                            <img src={imagePreview} alt="Preview" />
                         </div>
                     )}
                 </div>
 
-                <div>
-                    <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold", color: "#4b5563" }}>วิดีโอสาธิตท่า</label>
+                <div className="form-group">
+                    <label>วิดีโอสาธิตท่า</label>
                     <input
                         type="file"
                         accept="video/*"
                         onChange={handleVideoChange}
-                        style={{ width: "100%", padding: "10px", borderRadius: "4px", border: "1px solid #d1d5db" }}
+                        className="form-input"
                     />
                 </div>
 
-                <div style={{ marginTop: "20px" }}>
+                <div className="submit-section">
                     <button
                         type="submit"
                         disabled={loading}
-                        style={{
-                            padding: "10px 20px",
-                            backgroundColor: "#8b5cf6",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "4px",
-                            cursor: loading ? "not-allowed" : "pointer",
-                            fontWeight: "bold",
-                            width: "100%"
-                        }}
+                        className="btn-submit"
                     >
                         {loading ? "กำลังบันทึก..." : "บันทึกท่าออกกำลังกาย"}
                     </button>

@@ -7,8 +7,7 @@ import { MdPeople, MdFitnessCenter, MdOutlineAdminPanelSettings, MdFormatListBul
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
-
-
+import "./AdminDashboard.scss";
 
 function AdminDashboard() {
     const navigate = useNavigate();
@@ -125,55 +124,53 @@ function AdminDashboard() {
     if (loading) return <div>กำลังโหลดข้อมูลสรุปผล...</div>;
 
     return (
-        <div>
-            <h2 style={{ marginBottom: "20px", color: "#333", fontWeight: "bold" }}>Dashboard Overview</h2>
-
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "20px" }}>
+        <div className="admin-dashboard">
+            <div className="dashboard-grid">
 
                 {/* Card 1: Users */}
-                <div onClick={() => navigate('/admin/users')} style={{ cursor: "pointer", background: "white", padding: "20px", borderRadius: "10px", boxShadow: "0 4px 15px rgba(0,0,0,0.05)", borderLeft: "5px solid #3b82f6", display: "flex", alignItems: "center", justifyContent: "space-between", transition: "transform 0.2s" }} className="admin-card">
-                    <div>
-                        <h4 style={{ margin: "0 0 10px 0", color: "#6b7280", fontSize: "1rem" }}>ผู้ใช้งานทั้งหมด</h4>
-                        <p style={{ margin: 0, fontSize: "2rem", fontWeight: "bold", color: "#1f2937" }}>{stats.totalUsers}</p>
+                <div onClick={() => navigate('/admin/users')} className="admin-card card-users">
+                    <div className="card-content">
+                        <h4>ผู้ใช้งานทั้งหมด</h4>
+                        <p>{stats.totalUsers}</p>
                     </div>
-                    <MdPeople style={{ fontSize: "3rem", color: "#bfdbfe" }} />
+                    <MdPeople className="icon-users" />
                 </div>
 
                 {/* Card 2: Programs */}
-                <div onClick={() => navigate('/admin/programs')} style={{ cursor: "pointer", background: "white", padding: "20px", borderRadius: "10px", boxShadow: "0 4px 15px rgba(0,0,0,0.05)", borderLeft: "5px solid #10b981", display: "flex", alignItems: "center", justifyContent: "space-between", transition: "transform 0.2s" }} className="admin-card">
-                    <div>
-                        <h4 style={{ margin: "0 0 10px 0", color: "#6b7280", fontSize: "1rem" }}>โปรแกรมทั้งหมด</h4>
-                        <p style={{ margin: 0, fontSize: "2rem", fontWeight: "bold", color: "#1f2937" }}>{stats.totalPrograms}</p>
+                <div onClick={() => navigate('/admin/programs')} className="admin-card card-programs">
+                    <div className="card-content">
+                        <h4>โปรแกรมทั้งหมด</h4>
+                        <p>{stats.totalPrograms}</p>
                     </div>
-                    <MdFitnessCenter style={{ fontSize: "3rem", color: "#a7f3d0" }} />
+                    <MdFitnessCenter className="icon-programs" />
                 </div>
 
                 {/* Card 3: Exercises */}
-                <div onClick={() => navigate('/admin/exercises')} style={{ cursor: "pointer", background: "white", padding: "20px", borderRadius: "10px", boxShadow: "0 4px 15px rgba(0,0,0,0.05)", borderLeft: "5px solid #8b5cf6", display: "flex", alignItems: "center", justifyContent: "space-between", transition: "transform 0.2s" }} className="admin-card">
-                    <div>
-                        <h4 style={{ margin: "0 0 10px 0", color: "#6b7280", fontSize: "1rem" }}>ท่าออกกำลังกายรวม</h4>
-                        <p style={{ margin: 0, fontSize: "2rem", fontWeight: "bold", color: "#1f2937" }}>{stats.totalExercises}</p>
+                <div onClick={() => navigate('/admin/exercises')} className="admin-card card-exercises">
+                    <div className="card-content">
+                        <h4>ท่าออกกำลังกายรวม</h4>
+                        <p>{stats.totalExercises}</p>
                     </div>
-                    <MdFormatListBulleted style={{ fontSize: "3rem", color: "#ddd6fe" }} />
+                    <MdFormatListBulleted className="icon-exercises" />
                 </div>
 
                 {/* Card 4: Admins */}
-                <div style={{ background: "white", padding: "20px", borderRadius: "10px", boxShadow: "0 4px 15px rgba(0,0,0,0.05)", borderLeft: "5px solid #f59e0b", display: "flex", alignItems: "center", justifyContent: "space-between", transition: "transform 0.2s" }} className="admin-card">
-                    <div>
-                        <h4 style={{ margin: "0 0 10px 0", color: "#6b7280", fontSize: "1rem" }}>ผู้ดูแลระบบ</h4>
-                        <p style={{ margin: 0, fontSize: "2rem", fontWeight: "bold", color: "#1f2937" }}>{stats.totalAdmins}</p>
+                <div className="admin-card card-admins">
+                    <div className="card-content">
+                        <h4>ผู้ดูแลระบบ</h4>
+                        <p>{stats.totalAdmins}</p>
                     </div>
-                    <MdOutlineAdminPanelSettings style={{ fontSize: "3rem", color: "#fde68a" }} />
+                    <MdOutlineAdminPanelSettings className="icon-admins" />
                 </div>
 
             </div>
 
             {/* Bottom Section: Graph & Logs */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "20px", marginTop: "30px" }}>
+            <div className="bottom-grid">
 
                 {/* Graph - Monthly Users */}
-                <div style={{ background: "white", padding: "20px", borderRadius: "10px", boxShadow: "0 4px 15px rgba(0,0,0,0.05)", gridColumn: "1 / -1", minHeight: "350px" }}>
-                    <h3 style={{ color: "#333", fontSize: "1.2rem", fontWeight: "bold", borderBottom: "2px solid #f3f4f6", paddingBottom: "10px", marginBottom: "20px" }}>กราฟสถิติผู้ใช้งานใหม่ (รายเดือน)</h3>
+                <div className="dashboard-panel chart-panel">
+                    <h3 className="panel-title">กราฟสถิติผู้ใช้งานใหม่ (รายเดือน)</h3>
                     <ResponsiveContainer width="100%" height={300}>
                         <BarChart data={monthlyUsers}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -186,76 +183,61 @@ function AdminDashboard() {
                 </div>
 
                 {/* Latest Users */}
-                <div style={{ background: "white", padding: "20px", borderRadius: "10px", boxShadow: "0 4px 15px rgba(0,0,0,0.05)" }}>
-                    <h3 style={{ color: "#333", fontSize: "1.2rem", fontWeight: "bold", borderBottom: "2px solid #f3f4f6", paddingBottom: "10px", marginBottom: "20px" }}>ผู้ใช้ใหม่ล่าสุด</h3>
-                    <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                <div className="dashboard-panel">
+                    <h3 className="panel-title">ผู้ใช้ใหม่ล่าสุด</h3>
+                    <ul className="dashboard-list">
                         {newUsers.length > 0 ? newUsers.map((u, i) => (
-                            <li key={i} style={{ padding: "12px 0", borderBottom: "1px solid #f3f4f6", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                                    <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "#bfdbfe", color: "#1e3a8a", display: "flex", justifyContent: "center", alignItems: "center", fontWeight: "bold" }}>
+                            <li key={i} className="list-item">
+                                <div className="item-info">
+                                    <div className="avatar">
                                         {u.name ? u.name.charAt(0).toUpperCase() : "?"}
                                     </div>
                                     <div>
-                                        <p style={{ margin: 0, fontWeight: "bold", color: "#374151" }}>{u.name || "ไม่มีชื่อ"}</p>
-                                        <p style={{ margin: 0, fontSize: "0.85rem", color: "#6b7280" }}>{u.email}</p>
+                                        <p className="item-name">{u.name || "ไม่มีชื่อ"}</p>
+                                        <p className="item-sub">{u.email}</p>
                                     </div>
                                 </div>
-                                <span style={{ fontSize: "0.85rem", color: "#9ca3af" }}>{formatDate(u.createdAt)}</span>
+                                <span className="item-meta">{formatDate(u.createdAt || u["createdAt "])}</span>
                             </li>
-                        )) : <li style={{ color: "#6b7280" }}>ยังไม่มีข้อมูลผู้ใช้</li>}
+                        )) : <li className="empty-message">ยังไม่มีข้อมูลผู้ใช้</li>}
                     </ul>
                 </div>
 
                 {/* Popular Programs */}
-                <div style={{ background: "white", padding: "20px", borderRadius: "10px", boxShadow: "0 4px 15px rgba(0,0,0,0.05)" }}>
-                    <h3 style={{ color: "#333", fontSize: "1.2rem", fontWeight: "bold", borderBottom: "2px solid #f3f4f6", paddingBottom: "10px", marginBottom: "20px" }}>โปรแกรมล่าสุด</h3>
-                    <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                <div className="dashboard-panel">
+                    <h3 className="panel-title">โปรแกรมล่าสุด</h3>
+                    <ul className="dashboard-list">
                         {popularPrograms.length > 0 ? popularPrograms.map((p, i) => (
-                            <li key={i} style={{ padding: "12px 0", borderBottom: "1px solid #f3f4f6", display: "flex", alignItems: "center", gap: "15px" }}>
+                            <li key={i} className="list-item program-item">
                                 {p.image ? (
-                                    <img src={p.image.startsWith("http") ? p.image : p.image} alt={p.name} style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "8px" }} />
+                                    <img src={p.image.startsWith("http") ? p.image : p.image} alt={p.name} className="thumbnail" />
                                 ) : (
-                                    <div style={{ width: "50px", height: "50px", backgroundColor: "#e5e7eb", borderRadius: "8px" }}></div>
+                                    <div className="placeholder-thumbnail"></div>
                                 )}
-                                <div>
-                                    <p style={{ margin: 0, fontWeight: "bold", color: "#374151" }}>{p.name || "ไม่มีชื่อโปรแกรม"}</p>
-                                    <p style={{ margin: 0, fontSize: "0.85rem", color: "#6b7280" }}>{p.exercises?.length || 0} ท่า • {p.duration || 0} นาที</p>
+                                <div className="item-info-text">
+                                    <p className="item-name">{p.name || "ไม่มีชื่อโปรแกรม"}</p>
+                                    <p className="item-sub">{p.exercises?.length || 0} ท่า • {p.duration || 0} นาที</p>
                                 </div>
                             </li>
-                        )) : <li style={{ color: "#6b7280" }}>ยังไม่มีข้อมูลโปรแกรม</li>}
+                        )) : <li className="empty-message">ยังไม่มีข้อมูลโปรแกรม</li>}
                     </ul>
                 </div>
 
                 {/* Activity Log */}
-                <div style={{ background: "white", padding: "20px", borderRadius: "10px", boxShadow: "0 4px 15px rgba(0,0,0,0.05)" }}>
-                    <h3 style={{ color: "#333", fontSize: "1.2rem", fontWeight: "bold", borderBottom: "2px solid #f3f4f6", paddingBottom: "10px", marginBottom: "20px" }}>Activity Log ล่าสุด</h3>
-                    <div style={{ position: "relative", paddingLeft: "20px", borderLeft: "2px solid #e5e7eb" }}>
+                <div className="dashboard-panel">
+                    <h3 className="panel-title">กิจกรรมล่าสุด</h3>
+                    <div className="activity-timeline">
                         {activityLog.length > 0 ? activityLog.map((log, i) => (
-                            <div key={i} style={{ position: "relative", marginBottom: "20px", paddingLeft: "15px" }}>
-                                <div style={{
-                                    position: "absolute",
-                                    left: "-27px",
-                                    top: "0",
-                                    width: "12px",
-                                    height: "12px",
-                                    borderRadius: "50%",
-                                    background: log.type === 'user' ? "#3b82f6" : "#10b981",
-                                    border: "2px solid white"
-                                }}></div>
-                                <p style={{ margin: 0, color: "#374151", fontWeight: "500" }}>{log.title}</p>
-                                <p style={{ margin: 0, fontSize: "0.85rem", color: "#9ca3af" }}>{log.time}</p>
+                            <div key={i} className="timeline-item">
+                                <div className={`timeline-dot ${log.type === 'user' ? 'dot-user' : 'dot-program'}`}></div>
+                                <p className="timeline-title">{log.title}</p>
+                                <p className="timeline-time">{log.time}</p>
                             </div>
-                        )) : <p style={{ color: "#6b7280" }}>ยังไม่มีประวัติการเคลื่อนไหว</p>}
+                        )) : <p className="empty-timeline">ยังไม่มีประวัติการเคลื่อนไหว</p>}
                     </div>
                 </div>
 
             </div>
-
-            <style>{`
-                .admin-card:hover {
-                    transform: translateY(-5px);
-                }
-            `}</style>
         </div>
     );
 }

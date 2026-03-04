@@ -1,0 +1,104 @@
+.user-management {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+
+  h2 {
+    color: #333;
+    margin-bottom: 20px;
+  }
+
+  .filter-bar {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+
+    .search-input {
+      padding: 10px 15px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      flex: 1;
+      min-width: 250px;
+      outline: none;
+    }
+    .status-select {
+      padding: 10px 15px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      outline: none;
+      background-color: white;
+      cursor: pointer;
+      min-width: 200px;
+    }
+  }
+
+  .table-container {
+    overflow-x: auto;
+    
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+
+      th {
+        padding: 12px 15px;
+        color: #4b5563;
+        background-color: #f3f4f6;
+        border-bottom: 2px solid #e5e7eb;
+      }
+
+      td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #f3f4f6;
+
+        &.font-bold {
+          font-weight: bold;
+        }
+      }
+      
+      .empty-row {
+        text-align: center;
+        padding: 20px;
+      }
+    }
+  }
+
+  .status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: bold;
+
+    &.badge-admin {
+      background-color: #fef3c7;
+      color: #d97706;
+    }
+    &.badge-user {
+      background-color: #e0e7ff;
+      color: #4338ca;
+    }
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 10px;
+
+    .btn {
+      padding: 6px 12px;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+
+      &.btn-primary {
+        background-color: #3b82f6;
+        min-width: 100px;
+      }
+      &.btn-danger {
+        background-color: #ef4444;
+      }
+    }
+  }
+}
