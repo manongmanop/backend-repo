@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Form, Button, Alert } from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
@@ -9,7 +8,18 @@ import {
 import { auth, db } from "../../firebase";
 import { doc, setDoc } from "firebase/firestore";
 import Swal from "sweetalert2";
-import { MdEmail, MdLock, MdPerson, MdVisibility, MdVisibilityOff } from "react-icons/md";
+
+import {
+  MdEmail,
+  MdLock,
+  MdVisibility,
+  MdVisibilityOff,
+  MdPersonAdd,
+  MdPerson,
+  MdLogin,
+  MdSupervisorAccount
+} from "react-icons/md";
+import "./Register.css";
 
 function AdminRegister() {
   const [email, setEmail] = useState("");
@@ -17,26 +27,81 @@ function AdminRegister() {
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
 
   const navigate = useNavigate();
 
+  const checkPasswordStrength = (password) => {
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+    return strength;
+  };
+
+  const handlePasswordChange = (e) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+    setPasswordStrength(checkPasswordStrength(newPassword));
+  };
+
+  const getPasswordStrengthText = (strength) => {
+    switch (strength) {
+      case 0:
+      case 1: return "อ่อนแอ";
+      case 2: return "ปานกลาง";
+      case 3: return "แข็งแกร่ง";
+      case 4:
+      case 5: return "แข็งแกร่งมาก";
+      default: return "";
+    }
+  };
+
+  const getPasswordStrengthColor = (strength) => {
+    switch (strength) {
+      case 0:
+      case 1: return "#dc3545";
+      case 2: return "#ffc107";
+      case 3: return "#fd7e14";
+      case 4:
+      case 5: return "#28a745";
+      default: return "#dee2e6";
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
     if (!name || !email || !password) {
       return Swal.fire({
         icon: "warning",
         title: "ข้อมูลไม่ครบ",
         text: "กรุณากรอกชื่อ อีเมล และรหัสผ่าน",
+        confirmButtonColor: "#27BAF9",
       });
     }
 
+    if (password.length < 6) {
+      return Swal.fire({
+        icon: "warning",
+        title: "รหัสผ่านไม่ปลอดภัย",
+        text: "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร",
+        confirmButtonColor: "#27BAF9",
+      });
+    }
+
+    setIsLoading(true);
+
     try {
-      // 1) สร้างบัญชีใหม่ (จะเซ็นอินเป็นบัญชีใหม่ชั่วคราว)
+      // 1) สร้างบัญชีใหม่
       const result = await createUserWithEmailAndPassword(auth, email, password);
       const newAdminUser = result.user;
 
-      // 2) ส่งอีเมลยืนยันไปยังบัญชีที่เพิ่งสร้าง
+      // 2) ส่งอีเมลยืนยัน
       await sendEmailVerification(newAdminUser);
 
       // 3) บันทึกข้อมูล admin ลง Firestore
@@ -48,125 +113,172 @@ function AdminRegister() {
         createdAt: new Date(),
       });
 
-      // 4) เซ็นเอาต์ เพื่อไม่ให้แอปอยู่ในสถานะเป็นผู้ใช้ที่เพิ่งสร้าง
-      //    (โดยปกติผู้สร้าง admin จะต้องกลับมา login ใหม่หลังยืนยันอีเมล)
+      // 4) เซ็นเอาต์
       await signOut(auth);
 
-      // 5) แจ้งความสำเร็จและนำทางไปหน้า Login (หรือหน้าอื่นที่คุณต้องการ)
+      // 5) แจ้งผล
       Swal.fire({
         icon: "success",
         title: "สมัคร Admin สำเร็จ",
         html: `ระบบได้ส่งอีเมลยืนยันไปยัง <strong>${email}</strong><br/>กรุณาตรวจสอบอีเมลและกดลิงก์ยืนยันก่อนเข้าสู่ระบบ`,
-        confirmButtonText: "ไปที่หน้า Login",
+        confirmButtonColor: "#27BAF9",
       }).then(() => {
-        navigate("/");
+        navigate("/login");
       });
 
     } catch (err) {
+      setIsLoading(false);
       console.error("Admin register error:", err);
-      setError(err.message || "เกิดข้อผิดพลาด");
+      let message = "เกิดข้อผิดพลาดในการสมัครผู้ดูแลระบบ";
+      if (err.code === "auth/email-already-in-use") {
+        message = "อีเมลนี้มีอยู่ในระบบแล้ว";
+      } else if (err.code === "auth/weak-password") {
+        message = "รหัสผ่านคาดเดาง่ายเกินไป";
+      } else if (err.code === "auth/invalid-email") {
+        message = "รูปแบบอีเมลไม่ถูกต้อง";
+      }
+
       Swal.fire({
         icon: "error",
         title: "สมัคร Admin ไม่สำเร็จ",
-        text: err.message || "เกิดข้อผิดพลาด โปรดลองอีกครั้ง",
+        text: message,
+        confirmButtonColor: "#27BAF9",
       });
     }
   };
 
   return (
     <div className="register-container">
+      <div className="floating-elements">
+        <div className="floating-circle circle-1" style={{ background: "rgba(16, 185, 129, 0.1)" }}></div>
+        <div className="floating-circle circle-2" style={{ background: "rgba(59, 130, 246, 0.1)" }}></div>
+        <div className="floating-circle circle-3" style={{ background: "rgba(139, 92, 246, 0.1)" }}></div>
+      </div>
+
       <div className="register-box">
-        <h2 className="mb-3">Admin Registration</h2>
-
-        {error && <Alert variant="danger">{error}</Alert>}
-
-        <Form onSubmit={handleSubmit}>
-
-          {/* Name */}
-          <Form.Group className="mb-3">
-            <Form.Label>Name</Form.Label>
-            <div className="position-relative">
-              <Form.Control
-                type="text"
-                placeholder="Enter admin name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                style={{ textIndent: "35px" }}
-                required
-              />
-              <MdPerson
-                style={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "10px",
-                  transform: "translateY(-50%)",
-                }}
-              />
+        <div className="video-section">
+          <div className="video-overlay" style={{ background: "linear-gradient(135deg, rgba(31, 41, 55, 0.9) 0%, rgba(17, 24, 39, 0.95) 100%)" }}>
+            <div className="brand-section">
+              <MdSupervisorAccount className="brand-icon" style={{ fontSize: "3.5rem", color: "#60a5fa" }} />
+              <h1 className="brand-title" style={{ fontSize: "2rem", marginTop: "1rem" }}>ระบบผู้ดูแล</h1>
+              <p className="brand-subtitle">HealthCare Admin Portal</p>
             </div>
-          </Form.Group>
-
-          {/* Email */}
-          <Form.Group className="mb-3">
-            <Form.Label>Email</Form.Label>
-            <div className="position-relative">
-              <Form.Control
-                type="email"
-                placeholder="Enter admin email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                style={{ textIndent: "35px" }}
-                required
-              />
-              <MdEmail
-                style={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "10px",
-                  transform: "translateY(-50%)",
-                }}
-              />
+            <div className="welcome-text">
+              <h2 style={{ fontSize: "1.5rem" }}>จัดการฐานข้อมูลอย่างปลอดภัย</h2>
+              <p style={{ opacity: "0.8" }}>สำหรับบุคลากรภายในเท่านั้น</p>
             </div>
-          </Form.Group>
+            <div className="footer-section">
+              <span className="footer-text">มีบัญชีผู้ดูแลระบบแบบพิเศษอยู่แล้ว?</span>
+              <Link to="/login" className="footer-link">
+                <MdLogin className="footer-icon" />
+                เข้าสู่ระบบ (หน้าเข้าถึง)
+              </Link>
+            </div>
+          </div>
+        </div>
 
-          {/* Password */}
-          <Form.Group className="mb-4">
-            <Form.Label>Password</Form.Label>
-            <div className="position-relative">
-              <Form.Control
-                type={showPass ? "text" : "password"}
-                placeholder="Enter password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                style={{ textIndent: "35px" }}
-                required
-              />
-              <MdLock
-                style={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "10px",
-                  transform: "translateY(-50%)",
-                }}
-              />
-              <span
-                onClick={() => setShowPass(!showPass)}
-                style={{
-                  position: "absolute",
-                  top: "50%",
-                  right: "10px",
-                  transform: "translateY(-50%)",
-                  cursor: "pointer",
-                }}
+        <div className="form-section">
+          {/* Mobile Back Button */}
+          <Link to="/login" className="mobile-back-link">
+            <MdLogin className="back-icon" />
+            กลับไปหน้าเข้าสู่ระบบทั่วไป
+          </Link>
+
+          <div className="form-header">
+            <h2 className="form-title">สร้างบัญชีผู้ดูแลระบบ</h2>
+            <p className="form-subtitle">ลงทะเบียนการเข้าถึงระดับ Admin</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="register-form">
+            <div className="form-group" style={{ marginBottom: "1rem" }}>
+              <div className="input-wrapper">
+                <MdPerson className="input-icon" />
+                <input
+                  type="text"
+                  placeholder="ชื่อ-นามสกุลผู้แลระบบ"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="custom-input"
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+
+            <div className="form-group" style={{ marginBottom: "1rem" }}>
+              <div className="input-wrapper">
+                <MdEmail className="input-icon" />
+                <input
+                  type="email"
+                  placeholder="อีเมลองค์กร (เช่น @healthcare.com)"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="custom-input"
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+
+            <div className="form-group" style={{ marginBottom: "1rem" }}>
+              <div className="input-wrapper">
+                <MdLock className="input-icon" />
+                <input
+                  type={showPass ? "text" : "password"}
+                  placeholder="ตั้งรหัสผ่านที่ปลอดภัย"
+                  value={password}
+                  onChange={handlePasswordChange}
+                  className="custom-input"
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  className="toggle-password"
+                  onClick={() => setShowPass(!showPass)}
+                  disabled={isLoading}
+                >
+                  {showPass ? <MdVisibilityOff /> : <MdVisibility />}
+                </button>
+              </div>
+              {password && (
+                <div className="password-strength">
+                  <div className="strength-bar">
+                    <div
+                      className="strength-fill"
+                      style={{
+                        width: `${(passwordStrength / 5) * 100}%`,
+                        backgroundColor: getPasswordStrengthColor(passwordStrength)
+                      }}
+                    ></div>
+                  </div>
+                  <span
+                    className="strength-text"
+                    style={{ color: getPasswordStrengthColor(passwordStrength) }}
+                  >
+                    {getPasswordStrengthText(passwordStrength)}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            <div className="button-group" style={{ marginTop: "2rem" }}>
+              <button
+                type="submit"
+                className="primary-button"
+                style={{ background: "linear-gradient(45deg, #10b981, #059669)" }}
+                disabled={isLoading}
               >
-                {showPass ? <MdVisibilityOff /> : <MdVisibility />}
-              </span>
-            </div>
-          </Form.Group>
+                <MdPersonAdd className="button-icon" />
+                {isLoading ? "กำลังตรวจสอบข้อมูล..." : "ลงทะเบียน Admin"}
+              </button>
 
-          <Button type="submit" className="w-100 btn btn-primary">
-            Create Admin
-          </Button>
-        </Form>
+              <div className="login-redirect mobile-hide-desktop-show">
+                <span>มีสิทธิ์ผู้ดูแลอยู่แล้ว?</span>
+                <Link to="/login" className="login-link">
+                  เข้าสู่ระบบเลย
+                </Link>
+              </div>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
