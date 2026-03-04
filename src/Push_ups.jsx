@@ -412,33 +412,33 @@ export const usePushUpCamera = ({
               if (results.poseLandmarks) {
                 const landmarks = results.poseLandmarks;
 
-                // ตรวจสอบความพร้อมของจุดสำคัญ 4 จุด
-                const requiredLandmarks = [
-                  11, // LEFT_SHOULDER
-                  12, // RIGHT_SHOULDER
-                  27, // LEFT_ELBOW
-                  28, // RIGHT_ELBOW
-                ];
+                // // ตรวจสอบความพร้อมของจุดสำคัญ 4 จุด
+                // const requiredLandmarks = [
+                //   11, // LEFT_SHOULDER
+                //   12, // RIGHT_SHOULDER
+                //   27, // LEFT_ELBOW
+                //   28, // RIGHT_ELBOW
+                // ];
 
-                // ตรวจสอบว่าแต่ละจุดมี visibility สูงพอ (> 0.8)
-                const valid = requiredLandmarks.every(
-                  idx => landmarks[idx] && landmarks[idx].visibility > 0.8
-                );
-                setLandmarksValid(valid);
+                // // ตรวจสอบว่าแต่ละจุดมี visibility สูงพอ (> 0.8)
+                // const valid = requiredLandmarks.every(
+                //   idx => landmarks[idx] && landmarks[idx].visibility > 0.8
+                // );
+                // setLandmarksValid(valid);
 
-                // ถ้า landmarks ไม่ valid ให้ข้ามการประมวลผล
-                if (!valid) {
-                  canvasCtx.restore();
-                  return;
-                }
+                // // ถ้า landmarks ไม่ valid ให้ข้ามการประมวลผล
+                // if (!valid) {
+                //   canvasCtx.restore();
+                //   return;
+                // }
 
                 // Get coordinates
-                const leftShoulder = landmarks[11];
-                const rightShoulder = landmarks[12];
-                const leftElbow = landmarks[13];
-                const rightElbow = landmarks[14];
-                const leftWrist = landmarks[15];
-                const rightWrist = landmarks[16];
+                // const leftShoulder = landmarks[11];
+                // const rightShoulder = landmarks[12];
+                // const leftElbow = landmarks[13];
+                // const rightElbow = landmarks[14];
+                // const leftWrist = landmarks[15];
+                // const rightWrist = landmarks[16];
 
                 // Get lower body landmark positions
                 // const leftAnkle = landmarks[27];  // LEFT_ANKLE
@@ -453,8 +453,8 @@ export const usePushUpCamera = ({
                 // const shoulderWristDistanceRight = Math.abs(rightShoulder.x - rightWrist.x);
                 // const elbowDistanceLR = Math.abs(leftElbow.x - rightElbow.x);
                 // const wristDistanceLR = Math.abs(leftWrist.x - rightWrist.x);
-                const leftHandDist = Math.abs(leftWrist.x - leftShoulder.x);
-                const rightHandDist = Math.abs(rightWrist.x - rightShoulder.x);
+                // const leftHandDist = Math.abs(leftWrist.x - leftShoulder.x);
+                // const rightHandDist = Math.abs(rightWrist.x - rightShoulder.x);
 
                 // คำนวณตัวเลขแบบ normalized สำหรับส่วนล่าง
                 // const ankleDistanceNorm = Math.abs(leftAnkle.x - rightAnkle.x);
@@ -475,24 +475,24 @@ export const usePushUpCamera = ({
                 // }
                 // setLegStance(stance);
 
-                // คำนวณความต่างของแกน y ระหว่างไหล่
-                const shoulderDiffY = leftShoulder.y - rightShoulder.y;
-                const threshold = 0.03;
+                // // คำนวณความต่างของแกน y ระหว่างไหล่
+                // const shoulderDiffY = leftShoulder.y - rightShoulder.y;
+                // const threshold = 0.03;
 
-                // ตัดสินว่าตัวเอียงด้านไหน
-                let tilt = "Straight";
-                if (shoulderDiffY > threshold) {
-                  tilt = "Leaning Right";
-                } else if (shoulderDiffY < -threshold) {
-                  tilt = "Leaning Left";
-                }
-                setPostureTilt(tilt);
+                // // ตัดสินว่าตัวเอียงด้านไหน
+                // let tilt = "Straight";
+                // if (shoulderDiffY > threshold) {
+                //   tilt = "Leaning Right";
+                // } else if (shoulderDiffY < -threshold) {
+                //   tilt = "Leaning Left";
+                // }
+                // setPostureTilt(tilt);
 
-                // กำหนดสถานะตำแหน่งแขน
-                const leftPosition = getArmPosition(leftHandDist);
-                const rightPosition = getArmPosition(rightHandDist);
-                setLeftArmPosition(leftPosition);
-                setRightArmPosition(rightPosition);
+                // // กำหนดสถานะตำแหน่งแขน
+                // const leftPosition = getArmPosition(leftHandDist);
+                // const rightPosition = getArmPosition(rightHandDist);
+                // setLeftArmPosition(leftPosition);
+                // setRightArmPosition(rightPosition);
 
                 // Left arm processing
                 const shoulderLeft = landmarks[11];
@@ -698,10 +698,10 @@ export const usePushUpCamera = ({
     saveStatus,
     angleDataLeft: angleDataLeft.current,
     angleDataRight: angleDataRight.current,
-    postureTilt,
-    leftArmPosition,
-    rightArmPosition,
-    landmarksValid
+    // postureTilt,
+    // leftArmPosition,
+    // rightArmPosition,
+    // landmarksValid
     // legStance,
     // ankleDistance,
     // kneeDistance

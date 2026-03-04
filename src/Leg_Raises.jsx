@@ -412,25 +412,25 @@ export const useLegRaiseCamera = ({
               if (results.poseLandmarks) {
                 const landmarks = results.poseLandmarks;
 
-                // ตรวจสอบความพร้อมของจุดสำคัญ 4 จุด
-                const requiredLandmarks = [
-                  11, // LEFT_SHOULDER
-                  12, // RIGHT_SHOULDER
-                  27,
-                  28,
-                ];
+                // // ตรวจสอบความพร้อมของจุดสำคัญ 4 จุด
+                // const requiredLandmarks = [
+                //   11, // LEFT_SHOULDER
+                //   12, // RIGHT_SHOULDER
+                //   27,
+                //   28,
+                // ];
 
-                // ตรวจสอบว่าแต่ละจุดมี visibility สูงพอ (> 0.8)
-                const valid = requiredLandmarks.every(
-                  idx => landmarks[idx] && landmarks[idx].visibility > 0.8
-                );
-                setLandmarksValid(valid);
+                // // ตรวจสอบว่าแต่ละจุดมี visibility สูงพอ (> 0.8)
+                // const valid = requiredLandmarks.every(
+                //   idx => landmarks[idx] && landmarks[idx].visibility > 0.8
+                // );
+                // setLandmarksValid(valid);
 
-                // ถ้า landmarks ไม่ valid ให้ข้ามการประมวลผล
-                if (!valid) {
-                  canvasCtx.restore();
-                  return;
-                }
+                // // ถ้า landmarks ไม่ valid ให้ข้ามการประมวลผล
+                // if (!valid) {
+                //   canvasCtx.restore();
+                //   return;
+                // }
 
                 // Get coordinates
                 // const leftShoulder = landmarks[11];
@@ -440,13 +440,13 @@ export const useLegRaiseCamera = ({
                 // const leftWrist = landmarks[15];
                 // const rightWrist = landmarks[16];
 
-                // Get lower body landmark positions
-                const leftAnkle = landmarks[27];  // LEFT_ANKLE
-                const rightAnkle = landmarks[28]; // RIGHT_ANKLE
-                const leftHip = landmarks[23];    // LEFT_HIP
-                const rightHip = landmarks[24];   // RIGHT_HIP
-                const leftKnee = landmarks[25];   // LEFT_KNEE
-                const rightKnee = landmarks[26];  // RIGHT_KNEE
+                // // Get lower body landmark positions
+                // const leftAnkle = landmarks[27];  // LEFT_ANKLE
+                // const rightAnkle = landmarks[28]; // RIGHT_ANKLE
+                // const leftHip = landmarks[23];    // LEFT_HIP
+                // const rightHip = landmarks[24];   // RIGHT_HIP
+                // const leftKnee = landmarks[25];   // LEFT_KNEE
+                // const rightKnee = landmarks[26];  // RIGHT_KNEE
 
                 // คำนวณระยะทาง (normalized coordinates)
                 // const shoulderWristDistanceLeft = Math.abs(leftShoulder.x - leftWrist.x);
@@ -456,24 +456,24 @@ export const useLegRaiseCamera = ({
                 // const leftHandDist = Math.abs(leftWrist.x - leftShoulder.x);
                 // const rightHandDist = Math.abs(rightWrist.x - rightShoulder.x);
 
-                // คำนวณตัวเลขแบบ normalized สำหรับส่วนล่าง
-                const ankleDistanceNorm = Math.abs(leftAnkle.x - rightAnkle.x);
-                const kneeDistanceNorm = Math.abs(leftKnee.x - rightKnee.x);
-                const hipAnkleDistanceLeft = Math.abs(leftHip.x - leftAnkle.x);
-                const hipAnkleDistanceRight = Math.abs(rightHip.x - rightAnkle.x);
+                // // คำนวณตัวเลขแบบ normalized สำหรับส่วนล่าง
+                // const ankleDistanceNorm = Math.abs(leftAnkle.x - rightAnkle.x);
+                // const kneeDistanceNorm = Math.abs(leftKnee.x - rightKnee.x);
+                // const hipAnkleDistanceLeft = Math.abs(leftHip.x - leftAnkle.x);
+                // const hipAnkleDistanceRight = Math.abs(rightHip.x - rightAnkle.x);
 
-                บันทึกค่าระยะห่าง
-                setAnkleDistance(ankleDistanceNorm);
-                // setKneeDistance(kneeDistanceNorm);
+                // บันทึกค่าระยะห่าง
+                // setAnkleDistance(ankleDistanceNorm);
+                // // setKneeDistance(kneeDistanceNorm);
 
-                // ตัดสินว่า stance แบบไหน (ข้อเท้า)
-                let stance = "Normal";
-                if (ankleDistanceNorm > 0.10) {
-                  stance = "Wide";
-                } else if (ankleDistanceNorm < 0.04) {
-                  stance = "Narrow";
-                }
-                setLegStance(stance);
+                // // ตัดสินว่า stance แบบไหน (ข้อเท้า)
+                // let stance = "Normal";
+                // if (ankleDistanceNorm > 0.10) {
+                //   stance = "Wide";
+                // } else if (ankleDistanceNorm < 0.04) {
+                //   stance = "Narrow";
+                // }
+                // setLegStance(stance);
 
                 // คำนวณความต่างของแกน y ระหว่างไหล่
                 // const shoulderDiffY = leftShoulder.y - rightShoulder.y;
@@ -701,8 +701,8 @@ export const useLegRaiseCamera = ({
     // postureTilt,
     // leftArmPosition,
     // rightArmPosition,
-    landmarksValid,
-    legStance,
+    // landmarksValid,
+    // legStance,
     // ankleDistance,
     // kneeDistance
   };

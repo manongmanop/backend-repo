@@ -54,9 +54,9 @@ const AddUserDataForm = () => {
     const bmiValue = parseFloat(bmi);
     if (bmiValue < 18.5) return 'น้ำหนักต่ำกว่าเกณฑ์';
     if (bmiValue < 23) return 'น้ำหนักปกติ';
-    if (bmiValue < 25) return 'น้ำหนักเกิน';
-    if (bmiValue < 30) return 'อ้วนระดับ 1';
-    return 'อ้วนระดับ 2';
+    if (bmiValue < 25) return 'อ้วนระดับ 1';
+    if (bmiValue < 30) return 'อ้วนระดับ 2';
+    return 'อ้วนระดับ 3';
   };
 
   const handleSubmit = async (e) => {
@@ -71,11 +71,11 @@ const AddUserDataForm = () => {
       });
     }
 
-    if (parseInt(height) <= 0 || parseInt(weight) <= 0 || parseInt(height) > 500 || parseInt(weight) > 500) {
+    if (parseInt(height) <= 0 || parseInt(weight) <= 0 || parseInt(height) > 200 || parseInt(weight) > 100) {
       return Swal.fire({
         icon: 'warning',
         title: 'ข้อมูลไม่ถูกต้อง',
-        text: 'ส่วนสูงและน้ำหนักต้องมีค่าตั้งแต่ 1 ถึง 500 เท่านั้น',
+        text: 'ส่วนสูงและน้ำหนักต้องมีค่าไม่เกิน 200 Cm. และ 100 Kg.',
         confirmButtonColor: '#2563eb',
       });
     }
@@ -188,7 +188,7 @@ const AddUserDataForm = () => {
                   value={height}
                   onChange={(e) => {
                     const val = e.target.value.replace(/[^0-9]/g, '');
-                    if (val === '' || parseInt(val) <= 500) {
+                    if (val === '' || parseInt(val) <= 200) {
                       setHeight(val);
                     }
                   }}
@@ -213,7 +213,7 @@ const AddUserDataForm = () => {
                   value={weight}
                   onChange={(e) => {
                     const val = e.target.value.replace(/[^0-9]/g, '');
-                    if (val === '' || parseInt(val) <= 500) {
+                    if (val === '' || parseInt(val) <= 100) {
                       setWeight(val);
                     }
                   }}

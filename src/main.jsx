@@ -73,7 +73,7 @@ const router = createBrowserRouter([
   // Onboarding
   { path: "/onboarding", element: <ProtectedRoute><Onboarding /></ProtectedRoute> },
   { path: "/set-password", element: <ProtectedRoute><LinkEmailPassword /></ProtectedRoute> },
-  { path: "/AdminRegister", element: <ProtectedRoute><AdminRegister /></ProtectedRoute> },
+  { path: "/AdminRegister", element: <AdminRegister />},
 
 ])
 

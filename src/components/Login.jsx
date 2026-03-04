@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Form, Alert, Button } from "react-bootstrap";
 import { useUserAuth } from "../context/UserAuthContext";
-import { sendEmailVerification } from "firebase/auth";
+// import { sendEmailVerification } from "firebase/auth";
 import { auth, db } from "../../firebase";
 import { doc, getDoc } from "firebase/firestore";
 import "./login.scss";
@@ -19,6 +19,7 @@ import {
 import { FcGoogle } from "react-icons/fc";
 import { HiSparkles } from "react-icons/hi2";
 import Swal from "sweetalert2";
+import { signOut } from "firebase/auth";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -39,34 +40,42 @@ function Login() {
         text: "กรุณารอสักครู่",
         allowOutsideClick: false,
         showConfirmButton: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
+        didOpen: () => Swal.showLoading(),
       });
 
-      // ตรวจสอบว่าเป็น admin หรือไม่
       const adminDocRef = doc(db, "admin", user.uid);
       const adminSnap = await getDoc(adminDocRef);
 
       if (adminSnap.exists()) {
+        // ✅ reload เพื่อดึงสถานะล่าสุดจาก Firebase
+        await user.reload();
+        const refreshedUser = auth.currentUser;
+
+        if (!refreshedUser.emailVerified) {
+          await signOut(auth);
+          Swal.fire({
+            icon: "error",
+            title: "อีเมลยังไม่ยืนยัน",
+            text: "กรุณายืนยันอีเมลของคุณก่อนเข้าสู่ระบบในฐานะ Admin",
+            confirmButtonColor: "#27BAF9",
+          });
+          setIsLoading(false);
+          return;
+        }
+
         Swal.close();
         setIsLoading(false);
         return navigate("/homeadmin");
       }
 
-      // ถ้าไม่ใช่ admin → ไปเช็ค users ปกติ
+      // user ปกติ — ไม่เช็ค emailVerified
       const userDocRef = doc(db, "users", user.uid);
       const userDocSnap = await getDoc(userDocRef);
-
       Swal.close();
 
       if (userDocSnap.exists()) {
         const userData = userDocSnap.data();
-        if (userData.userstatus === "pass") {
-          navigate("/home");
-        } else {
-          navigate("/addinfo");
-        }
+        userData.userstatus === "pass" ? navigate("/home") : navigate("/addinfo");
       } else {
         navigate("/addinfo");
       }
@@ -106,15 +115,15 @@ function Login() {
 
     try {
       const userCredential = await logIn(email, password);
-      if (!userCredential.user.emailVerified) {
-        setIsLoading(false);
-        return Swal.fire({
-          icon: "error",
-          title: "อีเมลยังไม่ยืนยัน",
-          text: "กรุณายืนยันอีเมลของคุณก่อนเข้าสู่ระบบ",
-          confirmButtonColor: "#27BAF9",
-        });
-      }
+      // if (!userCredential.user.emailVerified) {
+      //   setIsLoading(false);
+      //   return Swal.fire({
+      //     icon: "error",
+      //     title: "อีเมลยังไม่ยืนยัน",
+      //     text: "กรุณายืนยันอีเมลของคุณก่อนเข้าสู่ระบบ",
+      //     confirmButtonColor: "#27BAF9",
+      //   });
+      // }
 
       await checkUserStatusAndNavigate(userCredential.user);
     } catch (err) {
@@ -160,42 +169,42 @@ function Login() {
     }
   };
 
-  const handleResendVerification = async () => {
-    try {
-      const user = auth.currentUser;
-      if (!user) {
-        return Swal.fire({
-          icon: "error",
-          title: "ไม่มีผู้ใช้",
-          text: "กรุณาเข้าสู่ระบบก่อน",
-          confirmButtonColor: "#27BAF9",
-        });
-      }
-      if (user.emailVerified) {
-        return Swal.fire({
-          icon: "info",
-          title: "ยืนยันแล้ว",
-          text: "อีเมลของคุณได้รับการยืนยันแล้ว",
-          confirmButtonColor: "#27BAF9",
-        });
-      }
+  // const handleResendVerification = async () => {
+  //   try {
+  //     const user = auth.currentUser;
+  //     if (!user) {
+  //       return Swal.fire({
+  //         icon: "error",
+  //         title: "ไม่มีผู้ใช้",
+  //         text: "กรุณาเข้าสู่ระบบก่อน",
+  //         confirmButtonColor: "#27BAF9",
+  //       });
+  //     }
+  //     if (user.emailVerified) {
+  //       return Swal.fire({
+  //         icon: "info",
+  //         title: "ยืนยันแล้ว",
+  //         text: "อีเมลของคุณได้รับการยืนยันแล้ว",
+  //         confirmButtonColor: "#27BAF9",
+  //       });
+  //     }
 
-      await sendEmailVerification(user);
-      Swal.fire({
-        icon: "success",
-        title: "ส่งอีเมลยืนยันแล้ว",
-        text: "กรุณาตรวจสอบกล่องจดหมายของคุณ (หากไม่พบโปรดตรวจสอบในกล่องจดหมายขยะ/Spam)",
-        confirmButtonColor: "#27BAF9",
-      });
-    } catch (err) {
-      Swal.fire({
-        icon: "error",
-        title: "เกิดข้อผิดพลาด",
-        text: "ไม่สามารถส่งอีเมลยืนยันได้ กรุณาลองใหม่ภายหลัง",
-        confirmButtonColor: "#27BAF9",
-      });
-    }
-  };
+  //     await sendEmailVerification(user);
+  //     Swal.fire({
+  //       icon: "success",
+  //       title: "ส่งอีเมลยืนยันแล้ว",
+  //       text: "กรุณาตรวจสอบกล่องจดหมายของคุณ (หากไม่พบโปรดตรวจสอบในกล่องจดหมายขยะ/Spam)",
+  //       confirmButtonColor: "#27BAF9",
+  //     });
+  //   } catch (err) {
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "เกิดข้อผิดพลาด",
+  //       text: "ไม่สามารถส่งอีเมลยืนยันได้ กรุณาลองใหม่ภายหลัง",
+  //       confirmButtonColor: "#27BAF9",
+  //     });
+  //   }
+  // };
 
   return (
     <div className="login-container">
@@ -321,7 +330,7 @@ function Login() {
             </div>
           </Form>
 
-          {error && error.includes("verify your email") && (
+          {/* {error && error.includes("verify your email") && (
             <Button
               variant="link"
               onClick={handleResendVerification}
@@ -330,7 +339,7 @@ function Login() {
             >
               ส่งอีเมลยืนยันอีกครั้ง
             </Button>
-          )}
+          )} */}
         </div>
       </div>
     </div>
