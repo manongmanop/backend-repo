@@ -13,12 +13,16 @@ function UserManagement() {
 
     const fetchData = async () => {
         try {
-            const [usersRes, adminsSnapshot] = await Promise.all([
-                axios.get(`/api/users`),
+            const [usersSnapshot, adminsSnapshot] = await Promise.all([
+                getDocs(collection(db, "users")),
                 getDocs(collection(db, "admin"))
             ]);
 
-            setUsers(usersRes.data);
+            const usersData = [];
+            usersSnapshot.forEach(doc => {
+                usersData.push({ _id: doc.id, firebaseUid: doc.id, ...doc.data() });
+            });
+            setUsers(usersData);
 
             const adminSet = new Set();
             adminsSnapshot.forEach(doc => {
@@ -97,8 +101,7 @@ function UserManagement() {
 
         if (result.isConfirmed) {
             try {
-                // NOTE: In a full production app, you might also need an admin endpoint to delete the user from Firebase Auth
-                await axios.delete(`/api/users/${id}`);
+                await deleteDoc(doc(db, "users", uid));
                 Swal.fire("ลบสำเร็จ", "ผู้ใช้ถูกลบออกจากระบบฐานข้อมูลแล้ว", "success");
                 fetchData(); // Refresh list
             } catch (err) {

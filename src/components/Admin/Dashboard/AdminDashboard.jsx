@@ -13,25 +13,21 @@ function AdminDashboard() {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                // Fetch users from MongoDB (or Firebase depending on your structure)
-                const usersRes = await axios.get(`/api/users`);
+                // Fetch users from Firestore
+                const usersSnapshot = await getDocs(collection(db, "users"));
+                // Fetch programs from MongoDB
                 const programsRes = await axios.get(`/api/workout_programs`);
+                // Fetch exercises from MongoDB
+                const exercisesRes = await axios.get(`/api/exercises`);
 
                 // Fetch admins from Firestore
                 const adminSnapshot = await getDocs(collection(db, "admin"));
 
-                let exercisesCount = 0;
-                if (programsRes.data && Array.isArray(programsRes.data)) {
-                    programsRes.data.forEach(p => {
-                        exercisesCount += (p.exercises?.length || p.workoutList?.length || 0);
-                    });
-                }
-
                 setStats({
-                    totalUsers: usersRes.data.length || 0,
+                    totalUsers: usersSnapshot.size || 0,
                     totalPrograms: programsRes.data.length || 0,
                     totalAdmins: adminSnapshot.size || 0,
-                    totalExercises: exercisesCount
+                    totalExercises: exercisesRes.data.length || 0
                 });
             } catch (err) {
                 console.error("Error fetching admin stats:", err);
