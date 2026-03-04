@@ -40,13 +40,31 @@ function AdminDashboard() {
                 // Fetch exercises from MongoDB
                 const exercisesRes = await axios.get(`/api/exercises`);
 
-                // Fetch admins from Firestore
+                // Fetch admins from 'admin' collection
                 const adminSnapshot = await getDocs(collection(db, "admin"));
+                const adminSet = new Set();
+                adminSnapshot.forEach(doc => {
+                    if (doc.data().role === 'admin') adminSet.add(doc.id);
+                });
+
+                // Union: Admins are anyone in 'admin' collection PLUS anyone in 'users' with role='admin'
+                let adminCount = adminSet.size;
+
+                // Also count total unique users (users + admins not in users collection)
+                // This ensures totalUsers is accurate even if some old admins are missing from 'users'
+                let userCount = usersSnapshot.size;
+                adminSet.forEach(adminId => {
+                    let foundInUsers = false;
+                    usersSnapshot.forEach(doc => {
+                        if (doc.id === adminId) foundInUsers = true;
+                    });
+                    if (!foundInUsers) userCount++;
+                });
 
                 setStats({
-                    totalUsers: usersSnapshot.size || 0,
+                    totalUsers: userCount || 0,
                     totalPrograms: programsRes.data.length || 0,
-                    totalAdmins: adminSnapshot.size || 0,
+                    totalAdmins: adminCount,
                     totalExercises: exercisesRes.data.length || 0
                 });
 

@@ -65,11 +65,30 @@ function UserManagement() {
             setUsers(usersData);
 
             const adminSet = new Set();
+            const adminsData = [];
             adminsSnapshot.forEach(doc => {
                 if (doc.data().role === 'admin') {
                     adminSet.add(doc.id);
+                    adminsData.push({ _id: doc.id, firebaseUid: doc.id, ...doc.data() });
                 }
             });
+
+            // Merge admins who are not in usersData
+            adminsData.forEach(admin => {
+                const exists = usersData.find(u => u.firebaseUid === admin.firebaseUid);
+                if (!exists) {
+                    usersData.push(admin);
+                }
+            });
+
+            // Sort by createdAt descending
+            usersData.sort((a, b) => {
+                const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+                const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+                return dateB - dateA;
+            });
+
+            setUsers(usersData);
             setAdminUids(adminSet);
         } catch (err) {
             console.error("Error fetching data:", err);
@@ -97,7 +116,9 @@ function UserManagement() {
 
         if (result.isConfirmed) {
             try {
+                // Delete from both collections to ensure complete removal
                 await deleteDoc(doc(db, "users", uid));
+                await deleteDoc(doc(db, "admin", uid));
                 Swal.fire("ลบสำเร็จ", "ผู้ใช้ถูกลบออกจากระบบฐานข้อมูลแล้ว", "success");
                 fetchData(); // Refresh list
             } catch (err) {

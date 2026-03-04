@@ -104,12 +104,23 @@ function AdminRegister() {
       // 2) ส่งอีเมลยืนยัน
       await sendEmailVerification(newAdminUser);
 
-      // 3) บันทึกข้อมูล admin ลง Firestore
+      // 3) บันทึกข้อมูล admin ลง Firestore (เก็บใน 2 collection เผื่อการ query แบบรวม)
+      // เก็บใน admin collection เพื่ออ้างอิงสิทธ์ปกปิด
       await setDoc(doc(db, "admin", newAdminUser.uid), {
         uid: newAdminUser.uid,
         name,
         email,
         role: "admin",
+        createdAt: new Date(),
+      });
+
+      // เก็บใน users collection ด้วยเพื่อให้โชว์ในตารางหลักและการนับยอด
+      await setDoc(doc(db, "users", newAdminUser.uid), {
+        uid: newAdminUser.uid,
+        name,
+        email,
+        role: "admin",
+        userstatus: "pass", // ข้ามการกรอกข้อมูลพื้นฐานไปเลย (แล้วแต่ระบบออกแบบ)
         createdAt: new Date(),
       });
 
