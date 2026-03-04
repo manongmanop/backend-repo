@@ -65,7 +65,7 @@ function Login() {
 
         Swal.close();
         setIsLoading(false);
-        return navigate("/homeadmin");
+        return navigate("/admin/dashboard");
       }
 
       // user ปกติ — ไม่เช็ค emailVerified
