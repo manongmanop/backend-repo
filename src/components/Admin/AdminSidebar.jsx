@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { MdDashboard, MdPeople, MdFitnessCenter, MdLogout } from "react-icons/md";
+import { MdDashboard, MdPeople, MdFitnessCenter, MdLogout, MdOutlineSportsGymnastics } from "react-icons/md";
 import { useUserAuth } from "../../context/UserAuthContext";
 
 function AdminSidebar() {
@@ -16,14 +16,15 @@ function AdminSidebar() {
     };
 
     const menuItems = [
-        { name: "Dashboard", path: "/admin/dashboard", icon: <MdDashboard /> },
+        { name: "แดชบอร์ด", path: "/admin/dashboard", icon: <MdDashboard /> },
         { name: "จัดการผู้ใช้งาน", path: "/admin/users", icon: <MdPeople /> },
         { name: "จัดการโปรแกรม", path: "/admin/programs", icon: <MdFitnessCenter /> },
+        { name: "จัดการท่าออกกำลังกาย", path: "/admin/exercises", icon: <MdOutlineSportsGymnastics /> },
     ];
 
     return (
         <div style={{
-            width: "250px",
+            width: "350px",
             backgroundColor: "#1f2937",
             color: "white",
             display: "flex",
@@ -31,7 +32,7 @@ function AdminSidebar() {
             boxShadow: "2px 0 5px rgba(0,0,0,0.1)"
         }}>
             <div style={{ padding: "20px", fontSize: "1.5rem", fontWeight: "bold", borderBottom: "1px solid #374151" }}>
-                ระบบจัดการ (Admin)
+                ระบบจัดการสำหรับผู้ดูแลระบบ
             </div>
 
             <div style={{ flex: 1, padding: "20px 0" }}>

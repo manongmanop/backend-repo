@@ -1,15 +1,27 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { doc, setDoc, deleteDoc, collection, getDocs } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
+import { doc, setDoc, deleteDoc, updateDoc, collection, getDocs } from "firebase/firestore";
 import { db } from "../../../../firebase";
 
 
 
 function UserManagement() {
+    const navigate = useNavigate();
     const [users, setUsers] = useState([]);
     const [adminUids, setAdminUids] = useState(new Set());
     const [loading, setLoading] = useState(true);
+
+    const formatDate = (dateObj) => {
+        if (!dateObj) return "-";
+        try {
+            const d = dateObj.toDate ? dateObj.toDate() : new Date(dateObj);
+            return isNaN(d.getTime()) ? "-" : d.toLocaleDateString("th-TH");
+        } catch (e) {
+            return "-";
+        }
+    };
 
     const fetchData = async () => {
         try {
@@ -111,6 +123,33 @@ function UserManagement() {
         }
     };
 
+    const handleSuspend = async (uid, isSuspended) => {
+        const action = isSuspended ? "ปลดระงับ" : "ระงับ";
+        const result = await Swal.fire({
+            title: `ยืนยันการ${action}`,
+            text: `คุณต้องการ${action}บัญชีผู้ใช้นี้หรือไม่?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: isSuspended ? "#10b981" : "#f59e0b",
+            cancelButtonColor: "#6b7280",
+            confirmButtonText: `ยืนยัน`,
+            cancelButtonText: "ยกเลิก"
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await updateDoc(doc(db, "users", uid), {
+                    isSuspended: !isSuspended
+                });
+                Swal.fire("สำเร็จ", `ทำการ${action}บัญชีเรียบร้อยแล้ว`, "success");
+                fetchData();
+            } catch (err) {
+                console.error("Error updating user status:", err);
+                Swal.fire("ข้อผิดพลาด", "ไม่สามารถเปลี่ยนสถานะผู้ใช้งานได้", "error");
+            }
+        }
+    };
+
     if (loading) return <div>กำลังโหลดรายชื่อ...</div>;
 
     return (
@@ -141,28 +180,60 @@ function UserManagement() {
                                     <td style={{ padding: "12px 15px", fontWeight: "bold" }}>{user.name || "ไม่มีชื่อ"}</td>
                                     <td style={{ padding: "12px 15px" }}>{user.email || "-"}</td>
                                     <td style={{ padding: "12px 15px" }}>
-                                        {adminUids.has(user.firebaseUid) ? (
+                                        {user.isSuspended ? (
+                                            <span style={{ padding: "4px 8px", backgroundColor: "#fee2e2", color: "#ef4444", borderRadius: "12px", fontSize: "0.85rem", fontWeight: "bold" }}>ระงับการใช้งาน</span>
+                                        ) : adminUids.has(user.firebaseUid) ? (
                                             <span style={{ padding: "4px 8px", backgroundColor: "#fef3c7", color: "#d97706", borderRadius: "12px", fontSize: "0.85rem", fontWeight: "bold" }}>Admin</span>
                                         ) : (
                                             <span style={{ padding: "4px 8px", backgroundColor: "#e0e7ff", color: "#4338ca", borderRadius: "12px", fontSize: "0.85rem", fontWeight: "bold" }}>User</span>
                                         )}
                                     </td>
-                                    <td style={{ padding: "12px 15px" }}>{new Date(user.createdAt).toLocaleDateString("th-TH")}</td>
+                                    <td style={{ padding: "12px 15px" }}>{formatDate(user.createdAt)}</td>
                                     <td style={{ padding: "12px 15px", display: "flex", gap: "10px" }}>
                                         <button
-                                            onClick={() => toggleAdmin(user.firebaseUid, adminUids.has(user.firebaseUid))}
+                                            onClick={() => navigate(`/admin/users/progress/${user.firebaseUid}`)}
                                             style={{
                                                 padding: "6px 12px",
-                                                backgroundColor: adminUids.has(user.firebaseUid) ? "#6b7280" : "#10b981",
+                                                backgroundColor: "#3b82f6",
                                                 color: "white",
                                                 border: "none",
                                                 borderRadius: "4px",
                                                 cursor: "pointer",
-                                                minWidth: "120px"
+                                                minWidth: "100px"
                                             }}
                                         >
-                                            {adminUids.has(user.firebaseUid) ? "ปลด Admin" : "ตั้งเป็น Admin"}
+                                            ดู Progress
                                         </button>
+                                        <button
+                                            onClick={() => handleSuspend(user.firebaseUid, user.isSuspended)}
+                                            style={{
+                                                padding: "6px 12px",
+                                                backgroundColor: user.isSuspended ? "#10b981" : "#f59e0b",
+                                                color: "white",
+                                                border: "none",
+                                                borderRadius: "4px",
+                                                cursor: "pointer",
+                                                minWidth: "100px"
+                                            }}
+                                        >
+                                            {user.isSuspended ? "ปลดระงับ" : "ระงับ"}
+                                        </button>
+                                        {!user.isSuspended && (
+                                            <button
+                                                onClick={() => toggleAdmin(user.firebaseUid, adminUids.has(user.firebaseUid))}
+                                                style={{
+                                                    padding: "6px 12px",
+                                                    backgroundColor: adminUids.has(user.firebaseUid) ? "#6b7280" : "#10b981",
+                                                    color: "white",
+                                                    border: "none",
+                                                    borderRadius: "4px",
+                                                    cursor: "pointer",
+                                                    minWidth: "120px"
+                                                }}
+                                            >
+                                                {adminUids.has(user.firebaseUid) ? "ปลด Admin" : "ตั้งเป็น Admin"}
+                                            </button>
+                                        )}
                                         <button
                                             onClick={() => handleDelete(user._id, user.firebaseUid)}
                                             style={{

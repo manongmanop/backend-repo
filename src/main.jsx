@@ -40,10 +40,13 @@ import AdminRoute from './auth/AdminRoute.jsx'
 import AdminLayout from './components/Admin/AdminLayout.jsx'
 import AdminDashboard from './components/Admin/Dashboard/AdminDashboard.jsx'
 import UserManagement from './components/Admin/Users/UserManagement.jsx'
+import UserProgress from './components/Admin/Users/UserProgress.jsx'
 import ProgramManagement from './components/Admin/Programs/ProgramManagement.jsx'
 import AddProgram from './components/Admin/Programs/AddProgram.jsx'
 import EditProgram from './components/Admin/Programs/EditProgram.jsx'
-
+import ExerciseManagement from './components/Admin/Exercises/ExerciseManagement.jsx'
+import AddExercise from './components/Admin/Exercises/AddExercise.jsx'
+import EditExercise from './components/Admin/Exercises/EditExercise.jsx'
 import TermsOfService from './components/Legal/TermsOfService.jsx'
 import PrivacyPolicy from './components/Legal/PrivacyPolicy.jsx'
 
@@ -91,9 +94,13 @@ const router = createBrowserRouter([
     children: [
       { path: "dashboard", element: <AdminDashboard /> },
       { path: "users", element: <UserManagement /> },
+      { path: "users/progress/:uid", element: <UserProgress /> },
       { path: "programs", element: <ProgramManagement /> },
       { path: "programs/add", element: <AddProgram /> },
-      { path: "programs/edit/:id", element: <EditProgram /> }
+      { path: "programs/edit/:id", element: <EditProgram /> },
+      { path: "exercises", element: <ExerciseManagement /> },
+      { path: "exercises/add", element: <AddExercise /> },
+      { path: "exercises/edit/:id", element: <EditExercise /> }
     ]
   }
 ])
