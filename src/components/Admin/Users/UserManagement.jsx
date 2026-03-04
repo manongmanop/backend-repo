@@ -1,19 +1,34 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { doc, setDoc, deleteDoc, collection, getDocs } from "firebase/firestore";
+import { db } from "../../../../firebase";
 
-const API_BASE = import.meta.env?.VITE_API_URL || "";
+const API_BASE = (import.meta.env?.VITE_API_URL || "").replace(/\/$/, "");
 
 function UserManagement() {
     const [users, setUsers] = useState([]);
+    const [adminUids, setAdminUids] = useState(new Set());
     const [loading, setLoading] = useState(true);
 
-    const fetchUsers = async () => {
+    const fetchData = async () => {
         try {
-            const res = await axios.get(`${API_BASE}/api/users`);
-            setUsers(res.data);
+            const [usersRes, adminsSnapshot] = await Promise.all([
+                axios.get(`${API_BASE}/api/users`),
+                getDocs(collection(db, "admin"))
+            ]);
+
+            setUsers(usersRes.data);
+
+            const adminSet = new Set();
+            adminsSnapshot.forEach(doc => {
+                if (doc.data().role === 'admin') {
+                    adminSet.add(doc.id);
+                }
+            });
+            setAdminUids(adminSet);
         } catch (err) {
-            console.error("Error fetching users:", err);
+            console.error("Error fetching data:", err);
             Swal.fire("ข้อผิดพลาด", "ไม่สามารถโหลดข้อมูลผู้ใช้งานได้", "error");
         } finally {
             setLoading(false);
@@ -21,8 +36,52 @@ function UserManagement() {
     };
 
     useEffect(() => {
-        fetchUsers();
+        fetchData();
     }, []);
+
+    const toggleAdmin = async (firebaseUid, isCurrentlyAdmin) => {
+        if (!firebaseUid) {
+            Swal.fire("ข้อผิดพลาด", "ไม่พบข้อมูลรหัสผู้ใช้ Firebase สำหรับบัญชีนี้", "error");
+            return;
+        }
+
+        const actionText = isCurrentlyAdmin ? "ปลดออกจากผู้ดูแลระบบ" : "แต่งตั้งเป็นผู้ดูแลระบบ";
+        const result = await Swal.fire({
+            title: "ยืนยันการเปลี่ยนแปลง?",
+            text: `คุณต้องการ${actionText}ใช่หรือไม่?`,
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "อัปเดต",
+            cancelButtonText: "ยกเลิก"
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const docRef = doc(db, "admin", firebaseUid);
+                if (isCurrentlyAdmin) {
+                    await deleteDoc(docRef);
+                } else {
+                    await setDoc(docRef, { role: "admin" });
+                }
+
+                // Update local state
+                const newAdminUids = new Set(adminUids);
+                if (isCurrentlyAdmin) {
+                    newAdminUids.delete(firebaseUid);
+                } else {
+                    newAdminUids.add(firebaseUid);
+                }
+                setAdminUids(newAdminUids);
+
+                Swal.fire("สำเร็จ", "อัปเดตสถานะเรียบร้อยแล้ว", "success");
+            } catch (error) {
+                console.error("Error updating admin status:", error);
+                Swal.fire("ข้อผิดพลาด", "ไม่สามารถอัปเดตสถานะได้", "error");
+            }
+        }
+    };
 
     const handleDelete = async (id, uid) => {
         const result = await Swal.fire({
@@ -41,7 +100,7 @@ function UserManagement() {
                 // NOTE: In a full production app, you might also need an admin endpoint to delete the user from Firebase Auth
                 await axios.delete(`${API_BASE}/api/users/${id}`);
                 Swal.fire("ลบสำเร็จ", "ผู้ใช้ถูกลบออกจากระบบฐานข้อมูลแล้ว", "success");
-                fetchUsers(); // Refresh list
+                fetchData(); // Refresh list
             } catch (err) {
                 console.error("Error deleting user:", err);
                 Swal.fire("ข้อผิดพลาด", "ไม่สามารถลบผู้ใช้งานได้", "error");
@@ -62,6 +121,7 @@ function UserManagement() {
                             <th style={{ padding: "12px 15px", color: "#4b5563" }}>ลำดับ</th>
                             <th style={{ padding: "12px 15px", color: "#4b5563" }}>ชื่อ</th>
                             <th style={{ padding: "12px 15px", color: "#4b5563" }}>อีเมล</th>
+                            <th style={{ padding: "12px 15px", color: "#4b5563" }}>สถานะ</th>
                             <th style={{ padding: "12px 15px", color: "#4b5563" }}>วันที่สมัคร</th>
                             <th style={{ padding: "12px 15px", color: "#4b5563" }}>จัดการ</th>
                         </tr>
@@ -77,8 +137,29 @@ function UserManagement() {
                                     <td style={{ padding: "12px 15px" }}>{index + 1}</td>
                                     <td style={{ padding: "12px 15px", fontWeight: "bold" }}>{user.name || "ไม่มีชื่อ"}</td>
                                     <td style={{ padding: "12px 15px" }}>{user.email || "-"}</td>
-                                    <td style={{ padding: "12px 15px" }}>{new Date(user.createdAt).toLocaleDateString("th-TH")}</td>
                                     <td style={{ padding: "12px 15px" }}>
+                                        {adminUids.has(user.firebaseUid) ? (
+                                            <span style={{ padding: "4px 8px", backgroundColor: "#fef3c7", color: "#d97706", borderRadius: "12px", fontSize: "0.85rem", fontWeight: "bold" }}>Admin</span>
+                                        ) : (
+                                            <span style={{ padding: "4px 8px", backgroundColor: "#e0e7ff", color: "#4338ca", borderRadius: "12px", fontSize: "0.85rem", fontWeight: "bold" }}>User</span>
+                                        )}
+                                    </td>
+                                    <td style={{ padding: "12px 15px" }}>{new Date(user.createdAt).toLocaleDateString("th-TH")}</td>
+                                    <td style={{ padding: "12px 15px", display: "flex", gap: "10px" }}>
+                                        <button
+                                            onClick={() => toggleAdmin(user.firebaseUid, adminUids.has(user.firebaseUid))}
+                                            style={{
+                                                padding: "6px 12px",
+                                                backgroundColor: adminUids.has(user.firebaseUid) ? "#6b7280" : "#10b981",
+                                                color: "white",
+                                                border: "none",
+                                                borderRadius: "4px",
+                                                cursor: "pointer",
+                                                minWidth: "120px"
+                                            }}
+                                        >
+                                            {adminUids.has(user.firebaseUid) ? "ปลด Admin" : "ตั้งเป็น Admin"}
+                                        </button>
                                         <button
                                             onClick={() => handleDelete(user._id, user.firebaseUid)}
                                             style={{

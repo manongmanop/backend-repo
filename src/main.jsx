@@ -41,6 +41,8 @@ import AdminLayout from './components/Admin/AdminLayout.jsx'
 import AdminDashboard from './components/Admin/Dashboard/AdminDashboard.jsx'
 import UserManagement from './components/Admin/Users/UserManagement.jsx'
 import ProgramManagement from './components/Admin/Programs/ProgramManagement.jsx'
+import AddProgram from './components/Admin/Programs/AddProgram.jsx'
+import EditProgram from './components/Admin/Programs/EditProgram.jsx'
 
 import TermsOfService from './components/Legal/TermsOfService.jsx'
 import PrivacyPolicy from './components/Legal/PrivacyPolicy.jsx'
@@ -89,7 +91,9 @@ const router = createBrowserRouter([
     children: [
       { path: "dashboard", element: <AdminDashboard /> },
       { path: "users", element: <UserManagement /> },
-      { path: "programs", element: <ProgramManagement /> }
+      { path: "programs", element: <ProgramManagement /> },
+      { path: "programs/add", element: <AddProgram /> },
+      { path: "programs/edit/:id", element: <EditProgram /> }
     ]
   }
 ])
