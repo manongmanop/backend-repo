@@ -12,7 +12,7 @@ function ProgramManagement() {
 
     const fetchPrograms = async () => {
         try {
-            const res = await axios.get(`/api/programs`);
+            const res = await axios.get(`/api/workout_programs`);
             setPrograms(res.data);
         } catch (err) {
             console.error("Error fetching programs:", err);
@@ -40,7 +40,7 @@ function ProgramManagement() {
 
         if (result.isConfirmed) {
             try {
-                await axios.delete(`/api/programs/${id}`);
+                await axios.delete(`/api/workout_programs/${id}`);
                 Swal.fire("สำเร็จ", "ลบโปรแกรมเรียบร้อยแล้ว", "success");
                 fetchPrograms();
             } catch (err) {

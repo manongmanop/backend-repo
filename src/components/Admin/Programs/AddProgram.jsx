@@ -52,8 +52,7 @@ function AddProgram() {
             }
 
             // Optional: specify token if backend requires Admin Auth.
-            // Assuming the axios interceptor or standard setup handles it, or public for now.
-            const res = await axios.post(`${API_BASE}/api/programs`, formData, {
+            const res = await axios.post(`/api/workout_programs`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data"
                 }

@@ -24,7 +24,7 @@ function EditProgram() {
     useEffect(() => {
         const fetchProgram = async () => {
             try {
-                const res = await axios.get(`/api/programs/${id}`);
+                const res = await axios.get(`/api/workout_programs/${id}`);
                 const data = res.data;
                 setName(data.name || "");
                 setDescription(data.description || "");
@@ -71,7 +71,7 @@ function EditProgram() {
                 formData.append("image", imageFile);
             }
 
-            const res = await axios.put(`/api/programs/${id}`, formData, {
+            const res = await axios.put(`/api/workout_programs/${id}`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data"
                 }

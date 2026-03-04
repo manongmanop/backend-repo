@@ -15,7 +15,7 @@ function AdminDashboard() {
             try {
                 // Fetch users from MongoDB (or Firebase depending on your structure)
                 const usersRes = await axios.get(`/api/users`);
-                const programsRes = await axios.get(`/api/programs`);
+                const programsRes = await axios.get(`/api/workout_programs`);
 
                 // Fetch admins from Firestore
                 const adminSnapshot = await getDocs(collection(db, "admin"));
