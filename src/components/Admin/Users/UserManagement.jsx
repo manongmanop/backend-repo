@@ -13,12 +13,41 @@ function UserManagement() {
     const [adminUids, setAdminUids] = useState(new Set());
     const [loading, setLoading] = useState(true);
 
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filterStatus, setFilterStatus] = useState("ทั้งหมด");
+
     const formatDate = (dateObj) => {
         if (!dateObj) return "-";
+
         try {
-            const d = dateObj.toDate ? dateObj.toDate() : new Date(dateObj);
-            return isNaN(d.getTime()) ? "-" : d.toLocaleDateString("th-TH");
+            let d;
+            // 1) Is it a Firebase Timestamp (has .toDate())?
+            if (dateObj.toDate && typeof dateObj.toDate === 'function') {
+                d = dateObj.toDate();
+            }
+            // 2) Is it already a Date object?
+            else if (dateObj instanceof Date) {
+                d = dateObj;
+            }
+            // 3) Is it a String? (e.g. from manual Firestore entry "March 4, 2026 at 8:46:29 PM UTC+7")
+            else if (typeof dateObj === 'string') {
+                // Remove the " at " which breaks JS Date parsing
+                const cleanString = dateObj.replace(" at ", " ");
+                d = new Date(cleanString);
+            }
+            // 4) Fallback (e.g. numbers / timestamps)
+            else {
+                d = new Date(dateObj);
+            }
+
+            // Return "-" if parsing failed
+            if (isNaN(d.getTime())) return "-";
+
+            // Format successfully
+            return d.toLocaleDateString("th-TH");
+
         } catch (e) {
+            console.error("Error formatting date:", e);
             return "-";
         }
     };
@@ -55,50 +84,6 @@ function UserManagement() {
         fetchData();
     }, []);
 
-    const toggleAdmin = async (firebaseUid, isCurrentlyAdmin) => {
-        if (!firebaseUid) {
-            Swal.fire("ข้อผิดพลาด", "ไม่พบข้อมูลรหัสผู้ใช้ Firebase สำหรับบัญชีนี้", "error");
-            return;
-        }
-
-        const actionText = isCurrentlyAdmin ? "ปลดออกจากผู้ดูแลระบบ" : "แต่งตั้งเป็นผู้ดูแลระบบ";
-        const result = await Swal.fire({
-            title: "ยืนยันการเปลี่ยนแปลง?",
-            text: `คุณต้องการ${actionText}ใช่หรือไม่?`,
-            icon: "question",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "อัปเดต",
-            cancelButtonText: "ยกเลิก"
-        });
-
-        if (result.isConfirmed) {
-            try {
-                const docRef = doc(db, "admin", firebaseUid);
-                if (isCurrentlyAdmin) {
-                    await deleteDoc(docRef);
-                } else {
-                    await setDoc(docRef, { role: "admin" });
-                }
-
-                // Update local state
-                const newAdminUids = new Set(adminUids);
-                if (isCurrentlyAdmin) {
-                    newAdminUids.delete(firebaseUid);
-                } else {
-                    newAdminUids.add(firebaseUid);
-                }
-                setAdminUids(newAdminUids);
-
-                Swal.fire("สำเร็จ", "อัปเดตสถานะเรียบร้อยแล้ว", "success");
-            } catch (error) {
-                console.error("Error updating admin status:", error);
-                Swal.fire("ข้อผิดพลาด", "ไม่สามารถอัปเดตสถานะได้", "error");
-            }
-        }
-    };
-
     const handleDelete = async (id, uid) => {
         const result = await Swal.fire({
             title: "แน่ใจหรือไม่?",
@@ -123,38 +108,60 @@ function UserManagement() {
         }
     };
 
-    const handleSuspend = async (uid, isSuspended) => {
-        const action = isSuspended ? "ปลดระงับ" : "ระงับ";
-        const result = await Swal.fire({
-            title: `ยืนยันการ${action}`,
-            text: `คุณต้องการ${action}บัญชีผู้ใช้นี้หรือไม่?`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: isSuspended ? "#10b981" : "#f59e0b",
-            cancelButtonColor: "#6b7280",
-            confirmButtonText: `ยืนยัน`,
-            cancelButtonText: "ยกเลิก"
-        });
+    const filteredUsers = users.filter(user => {
+        const matchesSearch = (user.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (user.email || "").toLowerCase().includes(searchTerm.toLowerCase());
 
-        if (result.isConfirmed) {
-            try {
-                await updateDoc(doc(db, "users", uid), {
-                    isSuspended: !isSuspended
-                });
-                Swal.fire("สำเร็จ", `ทำการ${action}บัญชีเรียบร้อยแล้ว`, "success");
-                fetchData();
-            } catch (err) {
-                console.error("Error updating user status:", err);
-                Swal.fire("ข้อผิดพลาด", "ไม่สามารถเปลี่ยนสถานะผู้ใช้งานได้", "error");
-            }
+        let matchesStatus = true;
+        if (filterStatus === "แอดมิน (Admin)") {
+            matchesStatus = adminUids.has(user.firebaseUid);
+        } else if (filterStatus === "ผู้ใช้งานทั่วไป") {
+            matchesStatus = !adminUids.has(user.firebaseUid);
         }
-    };
+
+        return matchesSearch && matchesStatus;
+    });
 
     if (loading) return <div>กำลังโหลดรายชื่อ...</div>;
 
     return (
         <div style={{ background: "white", padding: "20px", borderRadius: "8px", boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}>
-            <h2 style={{ marginBottom: "20px", color: "#333" }}>จัดการผู้ใช้งาน</h2>
+            <h2 style={{ color: "#333", marginBottom: "20px" }}>จัดการผู้ใช้งาน</h2>
+
+            {/* แถบค้นหา และ ตัวกรอง สถานะ */}
+            <div style={{ display: "flex", gap: "15px", marginBottom: "20px", flexWrap: "wrap" }}>
+                <input
+                    type="text"
+                    placeholder="🔍 ค้นหาชื่อ หรือ อีเมล..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    style={{
+                        padding: "10px 15px",
+                        border: "1px solid #d1d5db",
+                        borderRadius: "6px",
+                        flex: "1",
+                        minWidth: "250px",
+                        outline: "none"
+                    }}
+                />
+                <select
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    style={{
+                        padding: "10px 15px",
+                        border: "1px solid #d1d5db",
+                        borderRadius: "6px",
+                        outline: "none",
+                        backgroundColor: "white",
+                        cursor: "pointer",
+                        minWidth: "200px"
+                    }}
+                >
+                    <option value="ทั้งหมด">ผู้ใช้ทั้งหมด</option>
+                    <option value="แอดมิน (Admin)">แอดมิน (Admin)</option>
+                    <option value="ผู้ใช้งานทั่วไป">ผู้ใช้งานทั่วไป</option>
+                </select>
+            </div>
 
             <div style={{ overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
@@ -169,20 +176,18 @@ function UserManagement() {
                         </tr>
                     </thead>
                     <tbody>
-                        {users.length === 0 ? (
+                        {filteredUsers.length === 0 ? (
                             <tr>
-                                <td colSpan="5" style={{ textAlign: "center", padding: "20px" }}>ไม่มีข้อมูลผู้ใช้งาน</td>
+                                <td colSpan="6" style={{ textAlign: "center", padding: "20px" }}>ไม่พบข้อมูลผู้ใช้ที่ค้นหา</td>
                             </tr>
                         ) : (
-                            users.map((user, index) => (
+                            filteredUsers.map((user, index) => (
                                 <tr key={user._id} style={{ borderBottom: "1px solid #f3f4f6" }}>
                                     <td style={{ padding: "12px 15px" }}>{index + 1}</td>
                                     <td style={{ padding: "12px 15px", fontWeight: "bold" }}>{user.name || "ไม่มีชื่อ"}</td>
                                     <td style={{ padding: "12px 15px" }}>{user.email || "-"}</td>
                                     <td style={{ padding: "12px 15px" }}>
-                                        {user.isSuspended ? (
-                                            <span style={{ padding: "4px 8px", backgroundColor: "#fee2e2", color: "#ef4444", borderRadius: "12px", fontSize: "0.85rem", fontWeight: "bold" }}>ระงับการใช้งาน</span>
-                                        ) : adminUids.has(user.firebaseUid) ? (
+                                        {adminUids.has(user.firebaseUid) ? (
                                             <span style={{ padding: "4px 8px", backgroundColor: "#fef3c7", color: "#d97706", borderRadius: "12px", fontSize: "0.85rem", fontWeight: "bold" }}>Admin</span>
                                         ) : (
                                             <span style={{ padding: "4px 8px", backgroundColor: "#e0e7ff", color: "#4338ca", borderRadius: "12px", fontSize: "0.85rem", fontWeight: "bold" }}>User</span>
@@ -204,36 +209,6 @@ function UserManagement() {
                                         >
                                             ดู Progress
                                         </button>
-                                        <button
-                                            onClick={() => handleSuspend(user.firebaseUid, user.isSuspended)}
-                                            style={{
-                                                padding: "6px 12px",
-                                                backgroundColor: user.isSuspended ? "#10b981" : "#f59e0b",
-                                                color: "white",
-                                                border: "none",
-                                                borderRadius: "4px",
-                                                cursor: "pointer",
-                                                minWidth: "100px"
-                                            }}
-                                        >
-                                            {user.isSuspended ? "ปลดระงับ" : "ระงับ"}
-                                        </button>
-                                        {!user.isSuspended && (
-                                            <button
-                                                onClick={() => toggleAdmin(user.firebaseUid, adminUids.has(user.firebaseUid))}
-                                                style={{
-                                                    padding: "6px 12px",
-                                                    backgroundColor: adminUids.has(user.firebaseUid) ? "#6b7280" : "#10b981",
-                                                    color: "white",
-                                                    border: "none",
-                                                    borderRadius: "4px",
-                                                    cursor: "pointer",
-                                                    minWidth: "120px"
-                                                }}
-                                            >
-                                                {adminUids.has(user.firebaseUid) ? "ปลด Admin" : "ตั้งเป็น Admin"}
-                                            </button>
-                                        )}
                                         <button
                                             onClick={() => handleDelete(user._id, user.firebaseUid)}
                                             style={{
