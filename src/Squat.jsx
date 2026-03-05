@@ -111,9 +111,9 @@ export const useSquatCamera = ({
   const getColorForAngle = (angle) => {
     if (angle > 160) {
       return '#ff0000ff'; // Red
-    } else if (angle >= 20 && angle <= 40) {
+    } else if (angle >= 129 && angle <= 149) {
       return '#00ff00ff'; // Green
-    } else if ((angle > 40 && angle < 160) || angle < 20) {
+    } else if ((angle > 149 && angle < 159) || angle < 131) {
       return '#FFFF00'; // Yellow
     }
     return '#ffffffff'; // White
@@ -440,13 +440,13 @@ export const useSquatCamera = ({
                 // const leftWrist = landmarks[15];
                 // const rightWrist = landmarks[16];
 
-                // Get lower body landmark positions
-                const leftAnkle = landmarks[27];  // LEFT_ANKLE
-                const rightAnkle = landmarks[28]; // RIGHT_ANKLE
-                const leftHip = landmarks[23];    // LEFT_HIP
-                const rightHip = landmarks[24];   // RIGHT_HIP
-                const leftKnee = landmarks[25];   // LEFT_KNEE
-                const rightKnee = landmarks[26];  // RIGHT_KNEE
+                // // Get lower body landmark positions
+                // const leftAnkle = landmarks[27];  // LEFT_ANKLE
+                // const rightAnkle = landmarks[28]; // RIGHT_ANKLE
+                // const leftHip = landmarks[23];    // LEFT_HIP
+                // const rightHip = landmarks[24];   // RIGHT_HIP
+                // const leftKnee = landmarks[25];   // LEFT_KNEE
+                // const rightKnee = landmarks[26];  // RIGHT_KNEE
 
                 // คำนวณระยะทาง (normalized coordinates)
                 // const shoulderWristDistanceLeft = Math.abs(leftShoulder.x - leftWrist.x);

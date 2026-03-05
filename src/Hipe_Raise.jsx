@@ -111,9 +111,9 @@ export const useHipRaiseCamera = ({
   const getColorForAngle = (angle) => {
     if (angle > 160) {
       return '#ff0000ff'; // Red
-    } else if (angle >= 20 && angle <= 40) {
+    } else if (angle >= 145 && angle <= 165) {
       return '#00ff00ff'; // Green
-    } else if ((angle > 40 && angle < 160) || angle < 20) {
+    } else if ((angle > 130 && angle < 145) || angle < 165) {
       return '#FFFF00'; // Yellow
     }
     return '#ffffffff'; // White
