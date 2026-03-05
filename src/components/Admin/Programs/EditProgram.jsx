@@ -346,7 +346,10 @@ function EditProgram() {
                                                 value={item.sets || ""}
                                                 onChange={(e) => {
                                                     let val = e.target.value;
-                                                    if (val !== "" && Number(val) > 100) val = 100;
+                                                    if (val !== "") {
+                                                        val = Math.abs(Number(val));
+                                                        if (val > 100) val = 100;
+                                                    }
                                                     handleExerciseFieldChange(index, "sets", val);
                                                 }}
                                                 className="inline-input"
@@ -360,7 +363,10 @@ function EditProgram() {
                                                 value={item.reps || ""}
                                                 onChange={(e) => {
                                                     let val = e.target.value;
-                                                    if (val !== "" && Number(val) > 100) val = 100;
+                                                    if (val !== "") {
+                                                        val = Math.abs(Number(val));
+                                                        if (val > 100) val = 100;
+                                                    }
                                                     handleExerciseFieldChange(index, "reps", val);
                                                 }}
                                                 className="inline-input"
@@ -373,7 +379,7 @@ function EditProgram() {
                                                 value={item.time || ""}
                                                 maxLength="5"
                                                 onChange={(e) => {
-                                                    let val = e.target.value.replace(/[a-zA-Zก-ฮ]/g, "");
+                                                    let val = e.target.value.replace(/[^0-9:]/g, ""); // Allow only numbers and colon
                                                     if (!isNaN(val) && val.trim() !== "" && Number(val) > 60) val = "60";
                                                     handleExerciseFieldChange(index, "time", val);
                                                 }}
@@ -386,7 +392,7 @@ function EditProgram() {
                                                 value={item.weight || ""}
                                                 maxLength="15"
                                                 onChange={(e) => {
-                                                    let val = e.target.value.replace(/-/g, "");
+                                                    let val = e.target.value.replace(/[^a-zA-Z0-9]/g, ""); // Allow only letters and numbers
                                                     if (!isNaN(val) && val.trim() !== "" && Number(val) > 50) val = "50";
                                                     handleExerciseFieldChange(index, "weight", val);
                                                 }}
@@ -433,7 +439,10 @@ function EditProgram() {
                             value={newEx.sets}
                             onChange={(e) => {
                                 let val = e.target.value;
-                                if (val !== "" && Number(val) > 100) val = 100;
+                                if (val !== "") {
+                                    val = Math.abs(Number(val));
+                                    if (val > 100) val = 100;
+                                }
                                 setNewEx({ ...newEx, sets: val !== "" ? Number(val) : "" });
                             }}
                             className="small-input"
@@ -446,7 +455,10 @@ function EditProgram() {
                             value={newEx.reps}
                             onChange={(e) => {
                                 let val = e.target.value;
-                                if (val !== "" && Number(val) > 100) val = 100;
+                                if (val !== "") {
+                                    val = Math.abs(Number(val));
+                                    if (val > 100) val = 100;
+                                }
                                 setNewEx({ ...newEx, reps: val !== "" ? Number(val) : "" });
                             }}
                             className="small-input"
@@ -458,7 +470,7 @@ function EditProgram() {
                             value={newEx.time}
                             maxLength="5"
                             onChange={(e) => {
-                                let val = e.target.value.replace(/[a-zA-Zก-ฮ]/g, "");
+                                let val = e.target.value.replace(/[^0-9:]/g, "");
                                 if (!isNaN(val) && val.trim() !== "" && Number(val) > 60) val = "60";
                                 setNewEx({ ...newEx, time: val });
                             }}
@@ -470,7 +482,7 @@ function EditProgram() {
                             value={newEx.weight}
                             maxLength="15"
                             onChange={(e) => {
-                                let val = e.target.value.replace(/-/g, "");
+                                let val = e.target.value.replace(/[^a-zA-Z0-9]/g, "");
                                 if (!isNaN(val) && val.trim() !== "" && Number(val) > 50) val = "50";
                                 setNewEx({ ...newEx, weight: val });
                             }}
