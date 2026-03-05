@@ -342,10 +342,13 @@ function EditProgram() {
                                             <input
                                                 type="number"
                                                 min="0"
+                                                max="100"
                                                 value={item.sets || ""}
-                                                onChange={(e) =>
-                                                    handleExerciseFieldChange(index, "sets", e.target.value)
-                                                }
+                                                onChange={(e) => {
+                                                    let val = e.target.value;
+                                                    if (val !== "" && Number(val) > 100) val = 100;
+                                                    handleExerciseFieldChange(index, "sets", val);
+                                                }}
                                                 className="inline-input"
                                             />
                                         </td>
@@ -353,10 +356,13 @@ function EditProgram() {
                                             <input
                                                 type="number"
                                                 min="0"
+                                                max="100"
                                                 value={item.reps || ""}
-                                                onChange={(e) =>
-                                                    handleExerciseFieldChange(index, "reps", e.target.value)
-                                                }
+                                                onChange={(e) => {
+                                                    let val = e.target.value;
+                                                    if (val !== "" && Number(val) > 100) val = 100;
+                                                    handleExerciseFieldChange(index, "reps", val);
+                                                }}
                                                 className="inline-input"
                                             />
                                         </td>
@@ -365,9 +371,12 @@ function EditProgram() {
                                                 type="text"
                                                 placeholder="00:30"
                                                 value={item.time || ""}
-                                                onChange={(e) =>
-                                                    handleExerciseFieldChange(index, "time", e.target.value.replace(/[a-zA-Zก-ฮ]/g, ""))
-                                                }
+                                                maxLength="5"
+                                                onChange={(e) => {
+                                                    let val = e.target.value.replace(/[a-zA-Zก-ฮ]/g, "");
+                                                    if (!isNaN(val) && val.trim() !== "" && Number(val) > 60) val = "60";
+                                                    handleExerciseFieldChange(index, "time", val);
+                                                }}
                                                 className="inline-input time-input"
                                             />
                                         </td>
@@ -375,9 +384,12 @@ function EditProgram() {
                                             <input
                                                 type="text"
                                                 value={item.weight || ""}
-                                                onChange={(e) =>
-                                                    handleExerciseFieldChange(index, "weight", e.target.value.replace(/-/g, ""))
-                                                }
+                                                maxLength="15"
+                                                onChange={(e) => {
+                                                    let val = e.target.value.replace(/-/g, "");
+                                                    if (!isNaN(val) && val.trim() !== "" && Number(val) > 50) val = "50";
+                                                    handleExerciseFieldChange(index, "weight", val);
+                                                }}
                                                 className="inline-input weight-input"
                                             />
                                         </td>
@@ -417,16 +429,26 @@ function EditProgram() {
                         <input
                             type="number"
                             min="0"
+                            max="100"
                             value={newEx.sets}
-                            onChange={(e) => setNewEx({ ...newEx, sets: Number(e.target.value) })}
+                            onChange={(e) => {
+                                let val = e.target.value;
+                                if (val !== "" && Number(val) > 100) val = 100;
+                                setNewEx({ ...newEx, sets: val !== "" ? Number(val) : "" });
+                            }}
                             className="small-input"
                         />
                         <label>ครั้ง</label>
                         <input
                             type="number"
                             min="0"
+                            max="100"
                             value={newEx.reps}
-                            onChange={(e) => setNewEx({ ...newEx, reps: Number(e.target.value) })}
+                            onChange={(e) => {
+                                let val = e.target.value;
+                                if (val !== "" && Number(val) > 100) val = 100;
+                                setNewEx({ ...newEx, reps: val !== "" ? Number(val) : "" });
+                            }}
                             className="small-input"
                         />
                         <label>เวลา</label>
@@ -434,14 +456,24 @@ function EditProgram() {
                             type="text"
                             placeholder="00:30"
                             value={newEx.time}
-                            onChange={(e) => setNewEx({ ...newEx, time: e.target.value.replace(/[a-zA-Zก-ฮ]/g, "") })}
+                            maxLength="5"
+                            onChange={(e) => {
+                                let val = e.target.value.replace(/[a-zA-Zก-ฮ]/g, "");
+                                if (!isNaN(val) && val.trim() !== "" && Number(val) > 60) val = "60";
+                                setNewEx({ ...newEx, time: val });
+                            }}
                             className="small-input"
                         />
                         <label>น้ำหนัก</label>
                         <input
                             type="text"
                             value={newEx.weight}
-                            onChange={(e) => setNewEx({ ...newEx, weight: e.target.value.replace(/-/g, "") })}
+                            maxLength="15"
+                            onChange={(e) => {
+                                let val = e.target.value.replace(/-/g, "");
+                                if (!isNaN(val) && val.trim() !== "" && Number(val) > 50) val = "50";
+                                setNewEx({ ...newEx, weight: val });
+                            }}
                             className="small-input"
                         />
                     </div>
