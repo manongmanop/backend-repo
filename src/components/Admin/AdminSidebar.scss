@@ -5,6 +5,13 @@
   display: flex;
   flex-direction: column;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  
+  // Make sidebar sticky
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  // Options for scrolling the menu if it gets too long
+  overflow-y: auto;
 
   .sidebar-header {
     padding: 20px;
