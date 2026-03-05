@@ -111,9 +111,9 @@ export const usePushUpCamera = ({
   const getColorForAngle = (angle) => {
     if (angle > 160) {
       return '#ff0000ff'; // Red
-    } else if (angle >= 20 && angle <= 40) {
+    } else if (angle >= 60 && angle <= 80) {
       return '#00ff00ff'; // Green
-    } else if ((angle > 40 && angle < 160) || angle < 20) {
+    } else if ((angle > 60 && angle < 160) || angle < 80) {
       return '#FFFF00'; // Yellow
     }
     return '#ffffffff'; // White
