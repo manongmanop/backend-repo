@@ -366,7 +366,7 @@ function EditProgram() {
                                                 placeholder="00:30"
                                                 value={item.time || ""}
                                                 onChange={(e) =>
-                                                    handleExerciseFieldChange(index, "time", e.target.value)
+                                                    handleExerciseFieldChange(index, "time", e.target.value.replace(/[a-zA-Zก-ฮ]/g, ""))
                                                 }
                                                 className="inline-input time-input"
                                             />
@@ -376,7 +376,7 @@ function EditProgram() {
                                                 type="text"
                                                 value={item.weight || ""}
                                                 onChange={(e) =>
-                                                    handleExerciseFieldChange(index, "weight", e.target.value)
+                                                    handleExerciseFieldChange(index, "weight", e.target.value.replace(/-/g, ""))
                                                 }
                                                 className="inline-input weight-input"
                                             />
@@ -434,14 +434,14 @@ function EditProgram() {
                             type="text"
                             placeholder="00:30"
                             value={newEx.time}
-                            onChange={(e) => setNewEx({ ...newEx, time: e.target.value })}
+                            onChange={(e) => setNewEx({ ...newEx, time: e.target.value.replace(/[a-zA-Zก-ฮ]/g, "") })}
                             className="small-input"
                         />
                         <label>น้ำหนัก</label>
                         <input
                             type="text"
                             value={newEx.weight}
-                            onChange={(e) => setNewEx({ ...newEx, weight: e.target.value })}
+                            onChange={(e) => setNewEx({ ...newEx, weight: e.target.value.replace(/-/g, "") })}
                             className="small-input"
                         />
                     </div>
